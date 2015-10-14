@@ -1,0 +1,47 @@
+.twitch-chat {
+  display: inline-block;
+  
+  a {
+    color: #be6b0a;
+  }
+
+  .chatbox {
+    border: 1px solid #ccc;
+    overflow-y: scroll;
+    width: 400px;
+    height: 600px;
+
+    .chat-msg {
+      padding: 6px 12px;
+
+      // alternate message row colors
+      &:nth-child(even) {
+        background: #ededed;
+      }
+
+      .user, .msg {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .user {
+        width: 35%;
+
+        a {
+          font-size: 11px;
+
+          &.user-name {
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+          }
+        }
+      }
+
+      .msg {
+        width: 64%;
+      }
+    }
+  }
+}
