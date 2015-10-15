@@ -1,6 +1,10 @@
 import Ember from 'ember';
 
 export default Ember.Service.extend({
+  settings: Ember.inject.service(),
+
+  commands: Ember.inject.service(),
+
   client: null,
 
   channel: null,
@@ -11,40 +15,94 @@ export default Ember.Service.extend({
 
   mentions: [],
 
-  timeoutDuration: 300, // in seconds
+  viewerTimeoutDuration: 300, // in seconds
 
-  options: {
+  defaultOptions: {
     options: {
       debug: true
     },
 
     connection: {
-      random: "chat",
+      random: 'chat',
       reconnect: true
     },
 
     identity: {
-      username: "GhostCryptology",
-      password: "oauth:4yyli0229djl1ssqndzr73zgecf47w"
+      username: null,
+      password: null
     },
 
-    channels: ["#GhostCryptology"]
+    channels: ['#GhostCryptology']
   },
 
+  clientConfig: {},
+
+  clients: {},
+
+  streamerName: 'GhostCryptology',
+
+  botName: 'DevourBot',
+
+  commandPrefix: Ember.computed.alias('settings.prefs.commandPrefix'),
+
+  streamer: Ember.computed('streamer', function () {
+    return this.get('clients.' + this.get('streamerName'));
+  }),
+
+  bot: Ember.computed('streamer', function () {
+    return this.get('clients.' + this.get('botName'));
+  }),
+
   init() {
-    this.set('client', new irc.client(this.get('options')));
-    this.set('channel', this.get('options.channels')[0].replace('#', ''));
-    this.set('username', this.get('options.identity.username'));
-    
+    this.createUserClientConfigs();
+    this.createClients();
+
+    this.set('channel', this.get('defaultOptions.channels')[0].replace('#', ''));
+
     this.bindTwitchEvents();
   },
 
-  bindTwitchEvents() {
-    let client = this.get('client');
+  createUserClientConfigs() {
+    this.get('settings').getUsers().forEach(function (user) {
+      let username = user.username;
+      let oauth = user.oauth;
+      let config = Ember.$.extend({}, this.get('defaultOptions'));
 
-    client.on('chat', this.onChatReceived.bind(this));
-    client.on('connecting', this.onConnecting.bind(this));
-    client.on('connected', this.onConnected.bind(this));
+      config.identity = {
+        username: username, password: oauth
+      };
+
+      this.set('clientConfig.' + username, config);
+    }.bind(this));
+  },
+
+  createClients() {
+    let clientConfig = this.get('clientConfig');
+
+    for (let key in clientConfig) {
+      this.set('clients.' + key, new irc.client(clientConfig[key]));
+    }
+  },
+
+  bindTwitchEvents() {
+    let streamerClient = this.get('streamer');
+
+    streamerClient.on('chat', this.onChatReceived.bind(this));
+    streamerClient.on('connecting', this.onConnecting.bind(this));
+    streamerClient.on('connected', this.onConnected.bind(this));
+    streamerClient.on('emotesets', this.onEmoteSets.bind(this));
+  },
+
+  // TODO: finish emotes
+  onEmoteSets(sets) {
+    this.get('streamer').api({
+      url: '/chat/emoticon_images?emotesets=' + sets
+    }, function (err, res, body) {
+      // console.log('emotesets: ', body);
+      let emotes = body.emoticon_sets[0];
+
+      console.log('emotes: ', emotes[0]);
+    });
   },
 
   onConnecting() {
@@ -71,12 +129,18 @@ export default Ember.Service.extend({
       username: "dcryptzero"
      */
 
+
+    if (this.isCustomCommand(message)) {
+      this.processCommand(message);
+    }
+
     // if message is addressed to me specifically
     if (this.hasMention(message)) {
       this.saveMention({ content: message, user: user });
     }
 
     user.url = this.getUserProfile(user.username);
+    user.displayName = user['display-name'];
 
     this.captureChat({ content: message, user: user });
   },
@@ -90,11 +154,26 @@ export default Ember.Service.extend({
   },
 
   hasMention(message) {
-    return (message.toLowerCase().indexOf('@' + this.get('username').toLowerCase()) > -1);
+    return (message.toLowerCase().indexOf('@' + this.get('streamerName').toLowerCase()) > -1);
+  },
+
+  isCustomCommand(message) {
+    return message.indexOf(this.get('commandPrefix')) === 0;
+  },
+
+  processCommand(command) {
+    console.log('processing command: ', command);
+    this.get('commands').execute(command);
   },
 
   getUserProfile(username) {
     return 'http://www.twitch.tv/' + username;
+  },
+
+  getViewerList() {
+    return this.api('http://tmi.twitch.tv/group/user/ghostcryptology/chatters').then(function (response) {
+      return response.data;
+    });
   },
 
 /*******************************************************************************
@@ -107,23 +186,36 @@ export default Ember.Service.extend({
       if (this.get('connecting') || this.get('connected')) {
         resolve();
       } else {
-        let client = this.get('client');
-
         this.set('connecting', true);
 
-        client.connect();
+        let clients = this.get('clients');
+        let awaitingConnections = 0;
 
-        client.on('connected', function () {
+        let _onClientConnection = function () {
           this.onConnected.bind(this);
-          resolve();
-        }.bind(this));
+
+          awaitingConnections--;
+
+          if (!awaitingConnections) {
+            resolve();
+          }
+        }.bind(this);
+
+        for (let key in clients) {
+          let client = clients[key];
+
+          client.connect();
+          awaitingConnections++;
+
+          client.on('connected', _onClientConnection);
+        }
       }
     }.bind(this));
   },
 
   say(message) {
     if (this.get('connected')) {
-      this.get('client').say(this.get('channel'), message);
+      this.get('streamer').say(this.get('channel'), message);
     }
   },
 
@@ -132,19 +224,29 @@ export default Ember.Service.extend({
       return;
     }
 
-    this.client.on(event, handler);
+    this.get('streamer').on(event, handler);
   },
 
   ban(username) {
-    this.get('client').ban(this.get('channel'), username);
+    this.get('streamer').ban(this.get('channel'), username);
   },
 
   unban(username) {
-    this.get('client').unban(this.get('channel'), username);
+    this.get('streamer').unban(this.get('channel'), username);
   },
 
   timeout(username, duration) {
-    duration = duration || this.get('timeoutDuration');
-    this.get('client').timeout(this.get('channel'), username, duration);
+    duration = duration || this.get('viewerTimeoutDuration');
+    this.get('streamer').timeout(this.get('channel'), username, duration);
+  },
+
+  api(url) {
+    return new Ember.RSVP.Promise(function (resolve) {
+      this.get('streamer').api({
+        url: url
+      }, function (err, res, body) {
+        resolve(body);
+      });
+    }.bind(this));
   }
 });

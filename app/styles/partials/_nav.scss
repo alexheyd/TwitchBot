@@ -1,0 +1,23 @@
+nav {
+  background: #000;
+  color: #fff;
+  text-align: right;
+
+  li {
+    display: inline-block;
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 24px;
+    border-left: 1px solid #333;
+    margin: 0;
+    text-transform: uppercase;
+
+    &:first-child {
+      border-left: none;
+    }
+
+    &:hover {
+      color: #cc0000;
+    }
+  }
+}

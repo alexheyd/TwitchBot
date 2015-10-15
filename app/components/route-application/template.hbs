@@ -1,1 +1,13 @@
-{{outlet}}
+<nav>
+  <ul>
+    <li>{{link-to 'Settings' 'settings'}}</li>
+    <li>{{link-to 'Dashboard' 'dashboard'}}</li>
+    <li>{{link-to 'Giveaways' 'giveaways'}}</li>
+    <li>{{link-to 'Lists' 'lists'}}</li>
+    <li>{{link-to 'Loyalty' 'loyalty'}}</li>
+  </ul>
+</nav>
+
+<div id="main-app">
+  {{outlet}}
+</div>

@@ -1,17 +1,112 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames: ['twitch-chat'],
+  classNames: ['twitch-chat', 'row'],
 
   twitch: Ember.inject.service(),
 
+  autoScroll: true,
+
+  unreadMessages: false,
+
+  lastReadIndex: null,
+
+  chatInput: '',
+
+  enableChatInput: false,
+
+  enableViewerList: false,
+
   actions: {
-    timeout(message) {
-      console.log('timeout: ', message.user['user-id']);
+    jumpToLastRead() {
+      this.scrollToLastReadMessage();
+      this.set('unreadMessages', false);
+      this.set('lastReadIndex', null);
+    },
+
+    say() {
+      let chatInput = this.get('chatInput');
+
+      if (chatInput) {
+        this.get('twitch').say(chatInput);
+        this.set('chatInput', '');
+      }
     }
   },
 
   didInsertElement() {
+    // connect to twitch
     this.get('twitch').connect();
+
+    this.$('.chatbox').on('scroll', this.onScroll.bind(this));
+  },
+
+  // updates chat scroll position when new chat messages are received
+  didRender() {
+    this.markLastReadMessage();
+
+    // if user scrolled up, show New Messages badge
+
+    // if user is at the bottom of chat, auto scroll chat and set lastRead marker
+    // (only if a certain condition is met... need to determine proper condition)
+    // maybe if a lastRead marker exists, don't add new one. if not, add it to the last visible message
+
+    if (this.get('autoScroll')) {
+      this.scrollToBottom();
+    } else {
+      this.set('unreadMessages', true);
+    }
+  },
+
+  markLastReadMessage() {
+    let $chatbox = this.$('.chatbox');
+    let $messages = $chatbox.find('.chat-msg');
+    let index = this.get('messages').length - 1;
+
+    if (!this.isScrolledToTop()) {
+      if (!$chatbox.find('.last-msg').length && index > -1) {
+        // $chatbox.find('.last-msg').removeClass('last-msg');
+
+        console.log('index: ', index);
+
+        $messages.eq(index).addClass('last-msg');
+        this.set('lastReadIndex', index);
+      }
+    }
+  },
+
+  onScroll() {
+    this.set('autoScroll', false);
+
+    if (this.isScrolledToBottom()) {
+      this.set('autoScroll', true);
+    }
+  },
+
+  isScrolledToTop() {
+    return this.$('.chatbox')[0].scrollTop === 0;
+  },
+
+  isScrolledToBottom() {
+    let $chatbox = this.$('.chatbox');
+    let chatbox = $chatbox[0];
+
+    return chatbox.scrollTop === (chatbox.scrollHeight - $chatbox.height());
+  },
+
+  scrollToBottom() {
+    let chatbox = this.$('.chatbox')[0];
+    chatbox.scrollTop = chatbox.scrollHeight;
+  },
+
+  scrollToLastReadMessage() {
+    this.scrollTo(this.get('lastReadIndex'));
+  },
+
+  scrollTo(index) {
+    let message = this.$('.chat-msg').eq(index)[0];
+    let top = message.offsetTop;
+
+    this.$('.chatbox')[0].scrollTop = top;
   }
 });

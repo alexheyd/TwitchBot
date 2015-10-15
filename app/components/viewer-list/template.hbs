@@ -1,0 +1,13 @@
+<h3>Viewer List ({{viewerCount}})</h3>
+
+<div class="search">
+  {{input type="text" value=searchTerm placeholder="Search..."}}
+</div>
+
+<ul>
+  {{#each viewers as |viewer|}}
+    <li class="viewer">
+      <span class="username">{{viewer}}</span>
+    </li>
+  {{/each}}
+</ul>

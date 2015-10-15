@@ -1,17 +1,35 @@
-<h3>{{title}}</h3>
+<div class="col-xs-8">
+  <h3>{{title}}</h3>
 
-<div class="chatbox">
-  {{#each messages as |message|}}
-    <div class="chat-msg">
-      <div class="user">
-        <a href="{{message.user.url}}" class="user-name">{{message.user.username}}</a>
-        {{timeout-link user=message.user}}
-        {{ban-link user=message.user}}
-      </div>
+  <div class="chatbox">
+    {{#if unreadMessages}}
+      <button class="btn btn-info btn-unread" {{action "jumpToLastRead"}}>Unread Messages</button>
+    {{/if}}
 
-      <div class="msg">
-        {{message.content}}
+    {{#each messages as |message|}}
+      <div class="chat-msg">
+        <div class="user">
+          <a href="{{message.user.url}}" class="user-name">{{message.user.displayName}}</a>
+          {{timeout-link user=message.user}}
+          {{ban-link user=message.user}}
+        </div>
+
+        <div class="msg">
+          {{message.content}}
+        </div>
       </div>
+    {{/each}}
+  </div>
+
+  {{#if enableChatInput}}
+    <div class="msg-input">
+      {{input type="text" value=chatInput enter="say" placeholder="Say something..."}}
     </div>
-  {{/each}}
+  {{/if}}
 </div>
+
+{{#if enableViewerList}}
+  <div class="col-xs-4">
+    {{viewer-list}}
+  </div>
+{{/if}}

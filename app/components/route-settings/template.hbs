@@ -1,1 +1,42 @@
-Settings Route
+<div class="row">
+  <div class="col-xs-12">
+    <h2>Settings</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-6">
+    <h3>Add User</h3>
+
+    {{#each users as |user index|}}
+      <div class="user">
+        {{input type="text" value=user.username focus-out="save"}} {{input type="text" value=user.oauth focus-out="save"}} <button class="btn btn-danger" {{action "removeUser" user}}>Delete</button>
+      </div>
+    {{else}}
+      <div class="no-users">
+        No users added yet.
+      </div>
+    {{/each}}
+
+    <div class="add-user">
+      {{input type="text" class="new-username" value=newUsername placeholder="Username" enter="addUser"}}
+      {{input type="text" class="new-oauth" value=newOauth placeholder="OAuth Token" enter="addUser"}}
+
+      <button class="btn btn-primary" {{action "addUser"}}>Add User</button>
+    </div>
+  </div>
+
+  <div class="col-xs-6">
+    <h3>Default Channel</h3>
+    {{input type="text" focus-out="save" value=defaultChannel}}
+
+    <h3>Command Prefix</h3>
+    {{input type="text" focus-out="save" value=commandPrefix}}
+  </div>
+</div>
+
+<!-- <div class="row">
+  <div class="col-xs-12">
+    <button class="btn btn-primary" {{action "save"}}>Save</button>
+  </div>
+</div> -->
