@@ -26,7 +26,7 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     this.get('twitch').getViewerList().then(function (response) {
-      console.log('response: ', response);
+      console.log('viewer list response: ', response);
       this.set('viewerCount', response.chatter_count);
 
       // response.chatters.viewers = ['dcryptzero', 'devourssugar', 'keezy', 'meatlon', 'shortdude', 'hustlas'];

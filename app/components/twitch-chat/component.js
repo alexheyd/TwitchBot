@@ -56,6 +56,33 @@ export default Ember.Component.extend({
     } else {
       this.set('unreadMessages', true);
     }
+
+    let msgs = this.get('messages');
+
+    if (msgs.length) {
+      let lastMsg = msgs[msgs.length - 1];
+
+      if (lastMsg.processed) {
+        return;
+      }
+
+      let words = lastMsg.content.split(' ');
+      let newMsg = '';
+
+      console.log('words: ', words);
+
+      words.forEach(function (word) {
+        if (this.get('twitch').isEmote(word)) {
+          let imageUrl = this.get('twitch').getEmoteImageUrl(word);
+          word = `<img src="${imageUrl}" />`;
+        }
+
+        newMsg += word + ' ';
+      }.bind(this));
+
+      Ember.set(msgs[msgs.length - 1], 'content', newMsg);
+      Ember.set(msgs[msgs.length - 1], 'processed', true);
+    }
   },
 
   markLastReadMessage() {

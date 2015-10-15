@@ -1,5 +1,8 @@
 import Ember from 'ember';
 
+// devourssugar
+// oauth:2cu4zj8g78ke14agoi52g5z2l1fn0j
+
 export default Ember.Service.extend({
   settings: Ember.inject.service(),
 
@@ -14,6 +17,8 @@ export default Ember.Service.extend({
   chatroom: [],
 
   mentions: [],
+
+  emotes: null,
 
   viewerTimeoutDuration: 300, // in seconds
 
@@ -34,6 +39,8 @@ export default Ember.Service.extend({
 
     channels: ['#GhostCryptology']
   },
+
+  cachedEmotes: {},
 
   clientConfig: {},
 
@@ -91,18 +98,32 @@ export default Ember.Service.extend({
     streamerClient.on('connecting', this.onConnecting.bind(this));
     streamerClient.on('connected', this.onConnected.bind(this));
     streamerClient.on('emotesets', this.onEmoteSets.bind(this));
+
+    // this.get('clients.DevoursSugar').on('emotesets', this.onEmoteSets.bind(this));
   },
 
-  // TODO: finish emotes
   onEmoteSets(sets) {
-    this.get('streamer').api({
-      url: '/chat/emoticon_images?emotesets=' + sets
-    }, function (err, res, body) {
-      // console.log('emotesets: ', body);
-      let emotes = body.emoticon_sets[0];
+    console.log('#### sets: ', sets);
 
-      console.log('emotes: ', emotes[0]);
-    });
+    this.get('streamer').api({
+      url: '/chat/emoticon_images'
+    }, function (err, res, body) {
+      console.log('body: ', body);
+
+      let emotes = body.emoticons;
+      // let allEmotes = [];
+      //
+      // for (let key in emotes) {
+      //   allEmotes.push(emotes[key]);
+      // }
+
+      console.log('raw emotes: ', emotes);
+      // allEmotes = [].concat.apply([], allEmotes);
+
+      // console.log('flattened emotes: ', allEmotes);
+
+      this.saveEmotes(emotes);
+    }.bind(this));
   },
 
   onConnecting() {
@@ -115,6 +136,7 @@ export default Ember.Service.extend({
   },
 
   onChatReceived(channel, user, message, self) {
+    console.log('chat received. user: ', user);
     /*
       ## USER OBJECT ##
       color: null
@@ -142,7 +164,55 @@ export default Ember.Service.extend({
     user.url = this.getUserProfile(user.username);
     user.displayName = user['display-name'];
 
-    this.captureChat({ content: message, user: user });
+    this.captureChat({ content: this.escapeHtml(message), user: user });
+  },
+
+  escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
+
+  saveEmotes(emotes) {
+    let savedEmotes = {};
+
+    let _loopEmotes = function (e) {
+      e.forEach(function (emote) {
+        if (typeof emote === 'object') {
+          savedEmotes[emote.code] = {
+            id: emote.id, imageUrl: null
+          };
+        } else if (Ember.isArray(emote)) {
+          _loopEmotes(emote);
+        }
+      }.bind(this));
+    }.bind(this);
+
+    _loopEmotes(emotes);
+
+    this.set('emotes', savedEmotes);
+  },
+
+  getEmoteImageUrl(code) {
+    let id = this.getEmote(code).id;
+    let imageUrl = `http://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`;
+    this.saveEmoteImageUrl(code, imageUrl);
+    return imageUrl;
+  },
+
+  saveEmoteImageUrl(code, url) {
+    this.set('emotes.' + code + '.imageUrl', url);
+  },
+
+  getEmote(code) {
+    return this.get('emotes.' + code) || null;
+  },
+
+  isEmote(str) {
+    return typeof this.get('emotes')[str] !== 'undefined';
   },
 
   captureChat(message) {

@@ -9,13 +9,13 @@
     {{#each messages as |message|}}
       <div class="chat-msg">
         <div class="user">
-          <a href="{{message.user.url}}" class="user-name">{{message.user.displayName}}</a>
+          <a href="{{message.user.url}}" class="user-name" style="color: {{message.user.color}}">{{message.user.displayName}}</a>
           {{timeout-link user=message.user}}
           {{ban-link user=message.user}}
         </div>
 
         <div class="msg">
-          {{message.content}}
+          {{{message.content}}}
         </div>
       </div>
     {{/each}}
