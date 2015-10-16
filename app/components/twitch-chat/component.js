@@ -17,11 +17,19 @@ export default Ember.Component.extend({
 
   enableViewerList: false,
 
+  lastReadMarkerSet: false,
+
   actions: {
+    markAsLast(message) {
+      if (message.lastRead) {
+        this.markAllAsRead();
+      } else {
+        this.markLastRead(message);
+      }
+    },
+
     jumpToLastRead() {
-      this.scrollToLastReadMessage();
-      this.set('unreadMessages', false);
-      this.set('lastReadIndex', null);
+      this.scrollToLastReadMarker();
     },
 
     say() {
@@ -36,70 +44,60 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     // connect to twitch
-    this.get('twitch').connect();
-
+    // this.get('twitch').connect();
     this.$('.chatbox').on('scroll', this.onScroll.bind(this));
   },
 
   // updates chat scroll position when new chat messages are received
   didRender() {
-    this.markLastReadMessage();
-
-    // if user scrolled up, show New Messages badge
-
-    // if user is at the bottom of chat, auto scroll chat and set lastRead marker
-    // (only if a certain condition is met... need to determine proper condition)
-    // maybe if a lastRead marker exists, don't add new one. if not, add it to the last visible message
-
     if (this.get('autoScroll')) {
       this.scrollToBottom();
-    } else {
-      this.set('unreadMessages', true);
     }
 
+    this.convertEmojis();
+  },
+
+  convertEmojis() {
     let msgs = this.get('messages');
 
     if (msgs.length) {
       let lastMsg = msgs[msgs.length - 1];
+      let words = lastMsg.content.split(' ');
+      let newMessage = [];
 
-      if (lastMsg.processed) {
+      if (lastMsg.emojisConverted) {
         return;
       }
 
-      let words = lastMsg.content.split(' ');
-      let newMsg = '';
-
-      console.log('words: ', words);
-
+      // check each word in the message
       words.forEach(function (word) {
         if (this.get('twitch').isEmote(word)) {
-          let imageUrl = this.get('twitch').getEmoteImageUrl(word);
-          word = `<img src="${imageUrl}" />`;
+          // create emoji image tag
+          word = `<img src="${this.get('twitch').getEmoteImageUrl(word)}" />`;
         }
 
-        newMsg += word + ' ';
+        newMessage.push(word);
       }.bind(this));
 
-      Ember.set(msgs[msgs.length - 1], 'content', newMsg);
-      Ember.set(msgs[msgs.length - 1], 'processed', true);
+      // update view with converted emojis
+      Ember.set(lastMsg, 'content', newMessage.join(' '));
+
+      // prevent same message from being reprocessed
+      Ember.set(lastMsg, 'emojisConverted', true);
     }
   },
 
-  markLastReadMessage() {
-    let $chatbox = this.$('.chatbox');
-    let $messages = $chatbox.find('.chat-msg');
-    let index = this.get('messages').length - 1;
+  markLastRead(message) {
+    this.get('messages').setEach('lastRead', false);
+    this.set('lastReadMarkerSet', true);
+    this.set('unreadMessages', true);
+    Ember.set(message, 'lastRead', true);
+  },
 
-    if (!this.isScrolledToTop()) {
-      if (!$chatbox.find('.last-msg').length && index > -1) {
-        // $chatbox.find('.last-msg').removeClass('last-msg');
-
-        console.log('index: ', index);
-
-        $messages.eq(index).addClass('last-msg');
-        this.set('lastReadIndex', index);
-      }
-    }
+  markAllAsRead() {
+    this.get('messages').setEach('lastRead', false);
+    this.set('unreadMessages', false);
+    this.set('lastReadMarkerSet', false);
   },
 
   onScroll() {
@@ -126,8 +124,18 @@ export default Ember.Component.extend({
     chatbox.scrollTop = chatbox.scrollHeight;
   },
 
-  scrollToLastReadMessage() {
-    this.scrollTo(this.get('lastReadIndex'));
+  scrollToLastReadMarker() {
+    let msgs = this.get('messages');
+    let lastRead = msgs.findBy('lastRead', true);
+    let index = null;
+
+    if (lastRead) {
+      index = msgs.indexOf(lastRead);
+    }
+
+    if (typeof index !== 'undefined' && index !== null) {
+      this.scrollTo(index);
+    }
   },
 
   scrollTo(index) {

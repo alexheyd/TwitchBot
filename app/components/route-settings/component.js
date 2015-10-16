@@ -3,16 +3,13 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   settings: Ember.inject.service(),
 
-  classNames: ['settings'],
-
   users: Ember.computed.alias('settings.prefs.users'),
-
   defaultChannel: Ember.computed.alias('settings.prefs.defaultChannel'),
-
   commandPrefix: Ember.computed.alias('settings.prefs.commandPrefix'),
+  viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
 
+  classNames: ['settings'],
   newUsername: null,
-
   newOauth: null,
 
   actions: {

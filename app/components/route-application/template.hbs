@@ -1,21 +1,25 @@
 <nav class="row">
   <ul>
-    <li>{{link-to 'Settings' 'settings'}}</li>
-    <li>{{link-to 'Dashboard' 'dashboard'}}</li>
-    <li>{{link-to 'Giveaways' 'giveaways'}}</li>
-    <li>{{link-to 'Lists' 'lists'}}</li>
-    <li>{{link-to 'Loyalty' 'loyalty'}}</li>
+    <li>{{link-to "Settings" "settings"}}</li>
+    <li>{{link-to "Dashboard" "dashboard"}}</li>
+    <li>{{link-to "Giveaways" "giveaways"}}</li>
+    <li>{{link-to "Lists" "lists"}}</li>
+    <li>{{link-to "Loyalty" "loyalty"}}</li>
   </ul>
 </nav>
+
+{{notification-tray notification=notification}}
 
 <div class="row">
   <div id="chat" class="col-xs-6">
     <div class="row">
-      <div class="col-xs-8">
+      <div class="col-xs-12">
         {{twitch-chat title="Chat" messages=chatroom enableChatInput="true" enableViewerList="true"}}
       </div>
+    </div>
 
-      <div class="col-xs-4">
+    <div class="row">
+      <div id="chat-mentions" class="col-xs-12">
         {{twitch-chat title="Mentions" messages=mentions}}
       </div>
     </div>
@@ -25,3 +29,5 @@
     {{outlet}}
   </div>
 </div>
+
+{{outlet "modal"}}

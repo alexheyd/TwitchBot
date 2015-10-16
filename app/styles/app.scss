@@ -1,6 +1,8 @@
 @import "mixins/reset";
 @include reset;
 
+$header-height: 42px;
+
 @import
 "helpers/colors",
 
@@ -9,4 +11,5 @@
 "partials/nav",
 "partials/route-settings",
 "partials/viewer-list",
+"partials/notifications",
 "partials/twitch-chat";

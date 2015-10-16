@@ -5,22 +5,30 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
   settings: Ember.inject.service(),
-
   commands: Ember.inject.service(),
 
-  client: null,
+  channel: Ember.computed.alias('settings.prefs.defaultChannel'),
+  viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
+  commandPrefix: Ember.computed.alias('settings.prefs.commandPrefix'),
 
-  channel: null,
-
+  clients: {},
+  clientConfig: {},
   connected: false,
-
+  connecting: false,
+  fetchingEmotes: false,
   chatroom: [],
-
   mentions: [],
-
   emotes: null,
+  streamerName: 'GhostCryptology',
+  botName: 'DevourBot',
 
-  viewerTimeoutDuration: 300, // in seconds
+  streamer: Ember.computed('streamer', function () {
+    return this.get('clients.' + this.get('streamerName'));
+  }),
+
+  bot: Ember.computed('streamer', function () {
+    return this.get('clients.' + this.get('botName'));
+  }),
 
   defaultOptions: {
     options: {
@@ -40,47 +48,24 @@ export default Ember.Service.extend({
     channels: ['#GhostCryptology']
   },
 
-  cachedEmotes: {},
-
-  clientConfig: {},
-
-  clients: {},
-
-  streamerName: 'GhostCryptology',
-
-  botName: 'DevourBot',
-
-  commandPrefix: Ember.computed.alias('settings.prefs.commandPrefix'),
-
-  streamer: Ember.computed('streamer', function () {
-    return this.get('clients.' + this.get('streamerName'));
-  }),
-
-  bot: Ember.computed('streamer', function () {
-    return this.get('clients.' + this.get('botName'));
-  }),
-
   init() {
     this.createUserClientConfigs();
     this.createClients();
-
-    this.set('channel', this.get('defaultOptions.channels')[0].replace('#', ''));
-
     this.bindTwitchEvents();
   },
 
   createUserClientConfigs() {
-    this.get('settings').getUsers().forEach(function (user) {
-      let username = user.username;
-      let oauth = user.oauth;
+    let _createClientConfig = function (user) {
       let config = Ember.$.extend({}, this.get('defaultOptions'));
 
       config.identity = {
-        username: username, password: oauth
+        username: user.username, password: user.oauth
       };
 
-      this.set('clientConfig.' + username, config);
-    }.bind(this));
+      this.set('clientConfig.' + user.username, config);
+    }.bind(this);
+
+    this.get('settings').getUsers().forEach(_createClientConfig);
   },
 
   createClients() {
@@ -95,35 +80,22 @@ export default Ember.Service.extend({
     let streamerClient = this.get('streamer');
 
     streamerClient.on('chat', this.onChatReceived.bind(this));
-    streamerClient.on('connecting', this.onConnecting.bind(this));
-    streamerClient.on('connected', this.onConnected.bind(this));
     streamerClient.on('emotesets', this.onEmoteSets.bind(this));
-
-    // this.get('clients.DevoursSugar').on('emotesets', this.onEmoteSets.bind(this));
   },
 
-  onEmoteSets(sets) {
-    console.log('#### sets: ', sets);
-
-    this.get('streamer').api({
-      url: '/chat/emoticon_images'
-    }, function (err, res, body) {
-      console.log('body: ', body);
-
-      let emotes = body.emoticons;
-      // let allEmotes = [];
-      //
-      // for (let key in emotes) {
-      //   allEmotes.push(emotes[key]);
-      // }
+  onEmoteSets() {
+    let _saveEmotes = function (response) {
+      let emotes = response.emoticons;
 
       console.log('raw emotes: ', emotes);
-      // allEmotes = [].concat.apply([], allEmotes);
 
-      // console.log('flattened emotes: ', allEmotes);
+      // TODO: notify app emotes are done
 
       this.saveEmotes(emotes);
-    }.bind(this));
+    }.bind(this);
+
+    this.set('fetchingEmotes', true);
+    this.api('/chat/emoticon_images').then(_saveEmotes);
   },
 
   onConnecting() {
@@ -136,7 +108,7 @@ export default Ember.Service.extend({
   },
 
   onChatReceived(channel, user, message, self) {
-    console.log('chat received. user: ', user);
+    console.log('chat received from user: ', user);
     /*
       ## USER OBJECT ##
       color: null
@@ -193,13 +165,16 @@ export default Ember.Service.extend({
 
     _loopEmotes(emotes);
 
+    this.set('fetchingEmotes', false);
     this.set('emotes', savedEmotes);
   },
 
   getEmoteImageUrl(code) {
     let id = this.getEmote(code).id;
     let imageUrl = `http://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`;
+
     this.saveEmoteImageUrl(code, imageUrl);
+
     return imageUrl;
   },
 
@@ -212,7 +187,8 @@ export default Ember.Service.extend({
   },
 
   isEmote(str) {
-    return typeof this.get('emotes')[str] !== 'undefined';
+    let emotes = this.get('emotes');
+    return (emotes && typeof emotes[str] !== 'undefined');
   },
 
   captureChat(message) {
@@ -232,7 +208,6 @@ export default Ember.Service.extend({
   },
 
   processCommand(command) {
-    console.log('processing command: ', command);
     this.get('commands').execute(command);
   },
 
@@ -256,20 +231,19 @@ export default Ember.Service.extend({
       if (this.get('connecting') || this.get('connected')) {
         resolve();
       } else {
-        this.set('connecting', true);
-
         let clients = this.get('clients');
         let awaitingConnections = 0;
 
         let _onClientConnection = function () {
-          this.onConnected.bind(this);
-
           awaitingConnections--;
 
           if (!awaitingConnections) {
+            this.onConnected();
             resolve();
           }
         }.bind(this);
+
+        this.set('connecting', true);
 
         for (let key in clients) {
           let client = clients[key];
