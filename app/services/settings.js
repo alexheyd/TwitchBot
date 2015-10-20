@@ -15,7 +15,7 @@ export default Ember.Service.extend({
   },
 
   load() {
-    return new Ember.RSVP.Promise(function (resolve, reject) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
       let settings = this.get('storage').getItem('settings');
 
       if (settings) {
@@ -26,7 +26,7 @@ export default Ember.Service.extend({
         this.save();
         reject();
       }
-    }.bind(this));
+    });
   },
 
   getUsers() {

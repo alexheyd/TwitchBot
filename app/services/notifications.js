@@ -18,6 +18,6 @@ export default Ember.Service.extend({
   },
 
   remove() {
-    this.set('item', null)
+    this.set('item', null);
   }
 });

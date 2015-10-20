@@ -11,7 +11,11 @@ export default Ember.Component.extend({
 
   actions: {
     ban(user) {
-      this.get('banned') ? this.unban(user) : this.ban(user);
+      if (this.get('banned')) {
+        this.unban(user);
+      } else {
+        this.ban(user);
+      }
     }
   },
 

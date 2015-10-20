@@ -55,7 +55,7 @@ export default Ember.Service.extend({
   },
 
   createUserClientConfigs() {
-    let _createClientConfig = function (user) {
+    let _createClientConfig = user => {
       let config = Ember.$.extend({}, this.get('defaultOptions'));
 
       config.identity = {
@@ -63,7 +63,7 @@ export default Ember.Service.extend({
       };
 
       this.set('clientConfig.' + user.username, config);
-    }.bind(this);
+    };
 
     this.get('settings').getUsers().forEach(_createClientConfig);
   },
@@ -84,7 +84,7 @@ export default Ember.Service.extend({
   },
 
   onEmoteSets() {
-    let _saveEmotes = function (response) {
+    let _saveEmotes = response => {
       let emotes = response.emoticons;
 
       console.log('raw emotes: ', emotes);
@@ -92,7 +92,7 @@ export default Ember.Service.extend({
       // TODO: notify app emotes are done
 
       this.saveEmotes(emotes);
-    }.bind(this);
+    };
 
     this.set('fetchingEmotes', true);
     this.api('/chat/emoticon_images').then(_saveEmotes);
@@ -107,7 +107,7 @@ export default Ember.Service.extend({
     this.set('connected', true);
   },
 
-  onChatReceived(channel, user, message, self) {
+  onChatReceived(channel, user, message/*, self*/) {
     console.log('chat received from user: ', user);
     /*
       ## USER OBJECT ##
@@ -141,18 +141,18 @@ export default Ember.Service.extend({
 
   escapeHtml(unsafe) {
     return unsafe
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   },
 
   saveEmotes(emotes) {
     let savedEmotes = {};
 
-    let _loopEmotes = function (e) {
-      e.forEach(function (emote) {
+    let _loopEmotes = e => {
+      e.forEach(emote => {
         if (typeof emote === 'object') {
           savedEmotes[emote.code] = {
             id: emote.id, imageUrl: null
@@ -160,8 +160,8 @@ export default Ember.Service.extend({
         } else if (Ember.isArray(emote)) {
           _loopEmotes(emote);
         }
-      }.bind(this));
-    }.bind(this);
+      });
+    };
 
     _loopEmotes(emotes);
 
@@ -216,7 +216,7 @@ export default Ember.Service.extend({
   },
 
   getViewerList() {
-    return this.api('http://tmi.twitch.tv/group/user/ghostcryptology/chatters').then(function (response) {
+    return this.api('http://tmi.twitch.tv/group/user/ghostcryptology/chatters').then(response => {
       return response.data;
     });
   },
@@ -226,7 +226,7 @@ export default Ember.Service.extend({
 *******************************************************************************/
 
   connect() {
-    return new Ember.RSVP.Promise(function (resolve) {
+    return new Ember.RSVP.Promise(resolve => {
       // if currently connecting or already connected, resolve promise
       if (this.get('connecting') || this.get('connected')) {
         resolve();
@@ -234,14 +234,14 @@ export default Ember.Service.extend({
         let clients = this.get('clients');
         let awaitingConnections = 0;
 
-        let _onClientConnection = function () {
+        let _onClientConnection = () => {
           awaitingConnections--;
 
           if (!awaitingConnections) {
             this.onConnected();
             resolve();
           }
-        }.bind(this);
+        };
 
         this.set('connecting', true);
 
@@ -254,7 +254,7 @@ export default Ember.Service.extend({
           client.on('connected', _onClientConnection);
         }
       }
-    }.bind(this));
+    });
   },
 
   say(message) {
@@ -285,12 +285,12 @@ export default Ember.Service.extend({
   },
 
   api(url) {
-    return new Ember.RSVP.Promise(function (resolve) {
+    return new Ember.RSVP.Promise(resolve => {
       this.get('streamer').api({
         url: url
-      }, function (err, res, body) {
+      }, (err, res, body) => {
         resolve(body);
       });
-    }.bind(this));
+    });
   }
 });

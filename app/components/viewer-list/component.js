@@ -17,7 +17,7 @@ export default Ember.Component.extend({
     let searchTerm = this.get('searchTerm');
     let viewers = this.get('viewerList');
 
-    viewers = viewers.filter(function (viewer) {
+    viewers = viewers.filter(viewer => {
       return (viewer.indexOf(searchTerm) > -1);
     });
 
@@ -25,7 +25,7 @@ export default Ember.Component.extend({
   }.observes('searchTerm'),
 
   didInsertElement() {
-    this.get('twitch').getViewerList().then(function (response) {
+    this.get('twitch').getViewerList().then(response => {
       console.log('viewer list response: ', response);
       this.set('viewerCount', response.chatter_count);
       this.set('viewerList', response.chatters.viewers);

@@ -70,14 +70,14 @@ export default Ember.Component.extend({
       }
 
       // check each word in the message
-      words.forEach(function (word) {
+      words.forEach(word => {
         if (this.get('twitch').isEmote(word)) {
           // create emoji image tag
           word = `<img src="${this.get('twitch').getEmoteImageUrl(word)}" />`;
         }
 
         newMessage.push(word);
-      }.bind(this));
+      });
 
       // update view with converted emojis
       Ember.set(lastMsg, 'content', newMessage.join(' '));
