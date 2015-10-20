@@ -19,6 +19,8 @@ export default Ember.Service.extend({
   chatroom: [],
   mentions: [],
   emotes: null,
+  usableEmotes: null,
+  usableEmoteCount: 0,
   streamerName: 'GhostCryptology',
   botName: 'DevourBot',
 
@@ -55,17 +57,17 @@ export default Ember.Service.extend({
   },
 
   createUserClientConfigs() {
-    let _createClientConfig = user => {
-      let config = Ember.$.extend({}, this.get('defaultOptions'));
+    this.get('settings').getUsers().forEach(this.createClientConfig.bind(this));
+  },
 
-      config.identity = {
-        username: user.username, password: user.oauth
-      };
+  createClientConfig(user) {
+    let config = Ember.$.extend({}, this.get('defaultOptions'));
 
-      this.set('clientConfig.' + user.username, config);
+    config.identity = {
+      username: user.username, password: user.oauth
     };
 
-    this.get('settings').getUsers().forEach(_createClientConfig);
+    this.set('clientConfig.' + user.username, config);
   },
 
   createClients() {
@@ -83,19 +85,18 @@ export default Ember.Service.extend({
     streamerClient.on('emotesets', this.onEmoteSets.bind(this));
   },
 
-  onEmoteSets() {
-    let _saveEmotes = response => {
-      let emotes = response.emoticons;
-
-      console.log('raw emotes: ', emotes);
-
-      // TODO: notify app emotes are done
-
-      this.saveEmotes(emotes);
-    };
-
+  onEmoteSets(sets) {
     this.set('fetchingEmotes', true);
-    this.api('/chat/emoticon_images').then(_saveEmotes);
+    this.api('/chat/emoticon_images').then(this.processEmoteResponse.bind(this));
+    this.api(`/chat/emoticon_images?emotesets=${sets}`).then(this.processUsableEmoteResponse.bind(this));
+  },
+
+  processEmoteResponse(response) {
+    this.saveEmotes(response.emoticons);
+  },
+
+  processUsableEmoteResponse(response) {
+    this.extractUsableEmotes(response.emoticon_sets);
   },
 
   onConnecting() {
@@ -123,7 +124,6 @@ export default Ember.Service.extend({
       username: "dcryptzero"
      */
 
-
     if (this.isCustomCommand(message)) {
       this.processCommand(message);
     }
@@ -148,38 +148,45 @@ export default Ember.Service.extend({
       .replace(/'/g, '&#039;');
   },
 
-  saveEmotes(emotes) {
+  extractUsableEmotes(emoteSets) {
+    let fullSet = [];
+
+    for (let id in emoteSets) {
+      fullSet.push(emoteSets[id]);
+    }
+
+    let flatSet = [].concat.apply([], fullSet);
+    this.set('usableEmoteCount', flatSet.length);
+    this.saveUsableEmotes(flatSet);
+  },
+
+  extractEmotes(emotes) {
     let savedEmotes = {};
 
-    let _loopEmotes = e => {
-      e.forEach(emote => {
-        if (typeof emote === 'object') {
-          savedEmotes[emote.code] = {
-            id: emote.id, imageUrl: null
-          };
-        } else if (Ember.isArray(emote)) {
-          _loopEmotes(emote);
-        }
-      });
-    };
+    emotes.forEach(emote => {
+      if (typeof emote === 'object') {
+        savedEmotes[emote.code] = {
+          id: emote.id, imageUrl: `http://static-cdn.jtvnw.net/emoticons/v1/${emote.id}/1.0`
+        };
+      } else if (Ember.isArray(emote)) {
+        savedEmotes = this.extractEmotes(emote);
+      }
+    });
 
-    _loopEmotes(emotes);
+    return savedEmotes;
+  },
 
+  saveUsableEmotes(emotes) {
+    let usableEmotes = this.extractEmotes(emotes);
     this.set('fetchingEmotes', false);
-    this.set('emotes', savedEmotes);
+    this.set('usableEmotes', usableEmotes);
+
+    console.log('usable emotes: ', usableEmotes);
   },
 
-  getEmoteImageUrl(code) {
-    let id = this.getEmote(code).id;
-    let imageUrl = `http://static-cdn.jtvnw.net/emoticons/v1/${id}/1.0`;
-
-    this.saveEmoteImageUrl(code, imageUrl);
-
-    return imageUrl;
-  },
-
-  saveEmoteImageUrl(code, url) {
-    this.set('emotes.' + code + '.imageUrl', url);
+  saveEmotes(emotes) {
+    this.set('fetchingEmotes', false);
+    this.set('emotes', this.extractEmotes(emotes));
   },
 
   getEmote(code) {

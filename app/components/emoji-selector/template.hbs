@@ -1,0 +1,5 @@
+<ul>
+  {{#each emojis as |emoji|}}
+    <li><img src="{{emoji.imageUrl}}" {{action "useEmoji" emoji.code}} /></li>
+  {{/each}}
+</ul>

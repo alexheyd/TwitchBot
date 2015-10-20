@@ -73,7 +73,7 @@ export default Ember.Component.extend({
       words.forEach(word => {
         if (this.get('twitch').isEmote(word)) {
           // create emoji image tag
-          word = `<img src="${this.get('twitch').getEmoteImageUrl(word)}" />`;
+          word = `<img src="${this.get('twitch').getEmote(word).imageUrl}" />`;
         }
 
         newMessage.push(word);
