@@ -16,15 +16,21 @@ export default Ember.Service.extend({
 
   load() {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      let settings = this.get('storage').getItem('settings');
-
-      if (settings) {
-        this.set('prefs', JSON.parse(settings));
+      if (this.get('loaded')) {
         resolve();
       } else {
-        // save defaults
-        this.save();
-        reject();
+        let settings = this.get('storage').getItem('settings');
+
+        if (settings) {
+          this.set('prefs', JSON.parse(settings));
+          this.set('loaded', true);
+          resolve();
+        } else {
+          // save defaults
+          this.save();
+          this.set('loaded', true);
+          reject();
+        }
       }
     });
   },

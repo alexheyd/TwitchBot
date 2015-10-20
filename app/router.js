@@ -11,6 +11,7 @@ Router.map(function () {
   this.route('giveaways');
   this.route('lists');
   this.route('loyalty');
+  this.route('dev');
 });
 
 export default Router;

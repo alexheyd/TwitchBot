@@ -1,4 +1,4 @@
-<div id="notification" {{bind-attr class=":row notification.type notification:active"}}>
+<div id="notification" class="row {{notification.type}} {{notificationActive}}" {{bind-attr class=":row notification.type notification:active"}}>
   <div class="col-xs-12">
     {{notification.content}}
   </div>

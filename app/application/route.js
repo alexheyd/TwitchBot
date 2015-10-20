@@ -32,12 +32,12 @@ export default Ember.Route.extend({
   },
 
   connectToTwitch() {
-    this.get('twitch').connect().then(this.goToDashboard.bind(this));
+    this.get('twitch').connect();
   },
 
-  goToDashboard() {
-    this.transitionTo('dashboard');
-  },
+  // goToDashboard() {
+  //   this.transitionTo('dashboard');
+  // },
 
   goToSettings() {
     this.transitionTo('settings');

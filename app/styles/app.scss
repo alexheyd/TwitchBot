@@ -3,6 +3,12 @@
 
 $header-height: 42px;
 
+.dev {
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+}
+
 @import
 "helpers/colors",
 

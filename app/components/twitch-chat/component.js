@@ -43,8 +43,6 @@ export default Ember.Component.extend({
   },
 
   didInsertElement() {
-    // connect to twitch
-    // this.get('twitch').connect();
     this.$('.chatbox').on('scroll', this.onScroll.bind(this));
   },
 

@@ -86,9 +86,13 @@ export default Ember.Service.extend({
   },
 
   onEmoteSets(sets) {
+    let promises = [this.api('/chat/emoticon_images').then(this.processEmoteResponse.bind(this)), this.api(`/chat/emoticon_images?emotesets=${sets}`).then(this.processUsableEmoteResponse.bind(this))];
+
     this.set('fetchingEmotes', true);
-    this.api('/chat/emoticon_images').then(this.processEmoteResponse.bind(this));
-    this.api(`/chat/emoticon_images?emotesets=${sets}`).then(this.processUsableEmoteResponse.bind(this));
+
+    Ember.RSVP.all(promises).then(() => {
+      this.set('fetchingEmotes', false);
+    });
   },
 
   processEmoteResponse(response) {
@@ -178,15 +182,18 @@ export default Ember.Service.extend({
 
   saveUsableEmotes(emotes) {
     let usableEmotes = this.extractEmotes(emotes);
-    this.set('fetchingEmotes', false);
+    // this.set('fetchingEmotes', false);
     this.set('usableEmotes', usableEmotes);
 
     console.log('usable emotes: ', usableEmotes);
   },
 
   saveEmotes(emotes) {
-    this.set('fetchingEmotes', false);
-    this.set('emotes', this.extractEmotes(emotes));
+    let allEmotes = this.extractEmotes(emotes);
+    // this.set('fetchingEmotes', false);
+    this.set('emotes', allEmotes);
+
+    console.log('allEmotes: ', allEmotes);
   },
 
   getEmote(code) {

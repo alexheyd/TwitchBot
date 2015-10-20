@@ -25,8 +25,8 @@ export default Ember.Component.extend({
     _say();
 
     Ember.run.later(_say.bind(this, '@GhostCryptology hi'), 1000);
-    Ember.run.later(_say.bind(this), 2000);
-    Ember.run.later(_say.bind(this, '@GhostCryptology hello'), 3000);
+    // Ember.run.later(_say.bind(this), 2000);
+    // Ember.run.later(_say.bind(this, '@GhostCryptology hello'), 3000);
   },
   // END DEV CODE
   //************************************************************************
