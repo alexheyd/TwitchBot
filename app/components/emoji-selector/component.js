@@ -1,5 +1,6 @@
 import Ember from 'ember';
 
+// TODO: prevent broken images from displaying
 export default Ember.Component.extend({
   twitch: Ember.inject.service(),
   classNames: ['emoji-selector'],
@@ -7,28 +8,17 @@ export default Ember.Component.extend({
   emojiSelectorVisible: false,
 
   emojiSelectorClass: Ember.computed('emojiSelectorVisible', function () {
-    console.log('class change');
     return (this.get('emojiSelectorVisible')) ? 'visible' : '';
   }),
 
   actions: {
     useEmoji(code) {
       this.sendAction('useEmoji', code);
+      this.send('toggleEmojiSelector');
     },
 
     toggleEmojiSelector() {
-      console.log('toggling emoji selector');
       this.toggleProperty('emojiSelectorVisible');
     }
-  },
-
-  didInsertElement() {
-    console.log('didInsertElement emojis: ', this.get('emojis'));
-  },
-
-  emojisUpdated: function () {
-    let emojis = this.get('emojis');
-
-    console.log('EMOJIS UPDATED: ', emojis);
-  }.observes('twitch.usableEmotes.[]').on('init')
+  }
 });

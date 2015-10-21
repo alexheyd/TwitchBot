@@ -25,13 +25,11 @@ export default Ember.Component.extend({
   }.observes('searchTerm'),
 
   didInsertElement() {
-    Ember.run(this, function () {
-      this.get('twitch').getViewerList().then(response => {
-        console.log('viewer list response: ', response);
-        this.set('viewerCount', response.chatter_count);
-        this.set('viewerList', response.chatters.viewers);
-        this.set('viewers', response.chatters.viewers);
-      }.bind(this));
+    this.get('twitch').getViewerList().then(response => {
+      console.log('viewer list response: ', response);
+      this.set('viewerCount', response.chatter_count);
+      this.set('viewerList', response.chatters.viewers);
+      this.set('viewers', response.chatters.viewers);
     });
   }
 });
