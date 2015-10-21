@@ -15,11 +15,24 @@ export default Ember.Service.extend({
      * /list listName -- user joins listName
      * /unlist listName -- user leaves listName (if no listName, leaves all lists)
      * /random 50
-     * /poll "question with spaces":"answer 1":"answer 2"
-     *
+     * /poll "question with spaces" "answer 1" "answer 2"
+     * /vote answerNumber
      */
     hello(msg) {
       this.botSay('hello, ' + msg);
+    },
+
+    poll() {
+      let args = Array.prototype.slice.call(arguments);
+      let question = args.shift();
+      let answers = '';
+
+      args.forEach((answer, index) => {
+        let count = index + 1;
+        answers = `${answers} #${count}: ${answer} `;
+      });
+
+      this.botSay('Poll: ' + question + ' ' + answers);
     }
   },
 
@@ -28,13 +41,21 @@ export default Ember.Service.extend({
   },
 
   execute(command) {
-    // TODO: allow quotes to group a string (for poll questions)
-    command = command.replace(this.get('commandPrefix'), '').split(' ');
-    let cmd = command.shift();
+    command = command.replace(this.get('commandPrefix'), '');
+
+    // split on spaces except those within quotes
+    let commandArray = command.match(/(?:[^\s"]+|"[^"]*")+/g);
+
+    // remove double quotes
+    commandArray = commandArray.map((item) => {
+      return item.replace(/"/g, '');
+    });
+
+    let cmd = commandArray.shift();
     let handler = this.get('list.' + cmd);
 
     if (handler) {
-      handler.apply(this, command);
+      handler.apply(this, commandArray);
     }
   }
 });

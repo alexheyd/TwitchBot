@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 // TODO: prevent broken images from displaying
+// TODO: bind document click to close emoji selector if not clicked in component
 export default Ember.Component.extend({
   twitch: Ember.inject.service(),
   classNames: ['emoji-selector'],
@@ -15,6 +16,7 @@ export default Ember.Component.extend({
     useEmoji(code) {
       this.sendAction('useEmoji', code);
       this.send('toggleEmojiSelector');
+      // TODO: focus chat input box
     },
 
     toggleEmojiSelector() {
