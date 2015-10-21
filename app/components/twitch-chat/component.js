@@ -20,6 +20,10 @@ export default Ember.Component.extend({
   lastReadMarkerSet: false,
 
   actions: {
+    useEmoji(code) {
+      this.insertChat(code);
+    },
+
     markAsLast(message) {
       if (message.lastRead) {
         this.markAllAsRead();
@@ -42,12 +46,19 @@ export default Ember.Component.extend({
     }
   },
 
+  insertChat(str) {
+    if (str && typeof str === 'string') {
+      this.set('chatInput', `${this.get('chatInput')} ${str} `);
+    }
+  },
+
   didInsertElement() {
     this.$('.chatbox').on('scroll', this.onScroll.bind(this));
   },
 
   // updates chat scroll position when new chat messages are received
   didRender() {
+    // TODO: fix auto scroll
     if (this.get('autoScroll')) {
       this.scrollToBottom();
     }

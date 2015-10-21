@@ -1,5 +1,7 @@
-<ul>
-  {{#each emojis as |emoji|}}
-    <li><img src="{{emoji.imageUrl}}" {{action "useEmoji" emoji.code}} /></li>
-  {{/each}}
+<i class="fa fa-smile-o" {{action "toggleEmojiSelector"}}></i>
+
+<ul class="{{emojiSelectorClass}}">
+  {{#each-in emojis as |code emoji|}}
+    <li><img src="{{emoji.imageUrl}}" {{action "useEmoji" code}} /></li>
+  {{/each-in}}
 </ul>
