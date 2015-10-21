@@ -9,6 +9,15 @@ $header-height: 42px;
   background: #fff;
 }
 
+i {
+  cursor: pointer;
+  color: #333;
+
+  &:hover, &.selected {
+    color: #cc0000;
+  }
+}
+
 @import
 "helpers/colors",
 

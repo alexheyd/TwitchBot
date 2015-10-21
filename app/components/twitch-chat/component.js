@@ -7,7 +7,7 @@ export default Ember.Component.extend({
 
   autoScroll: true,
 
-  unreadMessages: false,
+  newMessages: false,
 
   lastReadIndex: null,
 
@@ -32,8 +32,12 @@ export default Ember.Component.extend({
       }
     },
 
-    jumpToLastRead() {
+    scrollToLastRead() {
       this.scrollToLastReadMarker();
+    },
+
+    scrollToBottom() {
+      this.scrollToBottom();
     },
 
     say() {
@@ -65,6 +69,10 @@ export default Ember.Component.extend({
 
     this.convertEmojis();
   },
+
+  onMessageAdded: function () {
+    this.set('newMessages', !this.isScrolledToBottom());
+  }.observes('messages.[]'),
 
   convertEmojis() {
     let msgs = this.get('messages');
@@ -99,13 +107,11 @@ export default Ember.Component.extend({
   markLastRead(message) {
     this.get('messages').setEach('lastRead', false);
     this.set('lastReadMarkerSet', true);
-    this.set('unreadMessages', true);
     Ember.set(message, 'lastRead', true);
   },
 
   markAllAsRead() {
     this.get('messages').setEach('lastRead', false);
-    this.set('unreadMessages', false);
     this.set('lastReadMarkerSet', false);
   },
 
@@ -114,6 +120,7 @@ export default Ember.Component.extend({
 
     if (this.isScrolledToBottom()) {
       this.set('autoScroll', true);
+      this.set('newMessages', false);
     }
   },
 
@@ -131,6 +138,7 @@ export default Ember.Component.extend({
   scrollToBottom() {
     let chatbox = this.$('.chatbox')[0];
     chatbox.scrollTop = chatbox.scrollHeight;
+    this.set('newMessages', false);
   },
 
   scrollToLastReadMarker() {
@@ -140,6 +148,9 @@ export default Ember.Component.extend({
 
     if (lastRead) {
       index = msgs.indexOf(lastRead);
+      // TODO: figure out if we want to unset last read message after jumping to it
+      // Ember.set(lastRead, 'lastRead', false);
+      // this.set('lastReadMarkerSet', false);
     }
 
     if (typeof index !== 'undefined' && index !== null) {

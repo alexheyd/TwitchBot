@@ -4,8 +4,9 @@
       <h3>{{title}}</h3>
 
       <div class="chatbox">
-        {{#if unreadMessages}}
-          <button class="btn btn-info btn-unread" {{action "jumpToLastRead"}}>Jump to Last Read</button>
+        {{#if lastReadMarkerSet}}
+          <div class="jump-to-last-read" {{action "scrollToLastRead"}}>Jump to last read</div>
+          <!-- <button class="btn btn-info btn-unread" {{action "jumpToLastRead"}}>Jump to Last Read</button> -->
         {{/if}}
 
         {{#each messages as |message|}}
@@ -13,12 +14,16 @@
         {{/each}}
       </div>
 
+      {{#if newMessages}}
+        <div class="jump-to-new" {{action "scrollToBottom"}}>New Messages</div>
+        <!-- <button class="btn btn-info btn-unread" {{action "jumpToLastRead"}}>Jump to Last Read</button> -->
+      {{/if}}
+
       {{#if enableChatInput}}
         <div class="msg-input">
           {{input type="text" value=chatInput enter="say" placeholder="Say something..."}}
+          {{emoji-selector useEmoji="useEmoji"}}
         </div>
-
-        {{emoji-selector useEmoji="useEmoji"}}
       {{/if}}
     </div>
 

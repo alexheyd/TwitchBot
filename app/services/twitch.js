@@ -140,7 +140,9 @@ export default Ember.Service.extend({
     user.url = this.getUserProfile(user.username);
     user.displayName = user['display-name'];
 
-    this.captureChat({ content: this.escapeHtml(message), user: user });
+    // NOTE: this is basically the chat message "model"
+    // TODO: abstract the chat message "model"
+    this.captureChat({ content: this.escapeHtml(message), user: user, starred: false });
   },
 
   escapeHtml(unsafe) {
@@ -182,7 +184,6 @@ export default Ember.Service.extend({
 
   saveUsableEmotes(emotes) {
     let usableEmotes = this.extractEmotes(emotes);
-    // this.set('fetchingEmotes', false);
     this.set('usableEmotes', usableEmotes);
 
     console.log('usable emotes: ', usableEmotes);
@@ -190,10 +191,14 @@ export default Ember.Service.extend({
 
   saveEmotes(emotes) {
     let allEmotes = this.extractEmotes(emotes);
-    // this.set('fetchingEmotes', false);
     this.set('emotes', allEmotes);
 
     console.log('allEmotes: ', allEmotes);
+  },
+
+  removeUsableEmojiByCode(code) {
+    delete this.usableEmotes[code];
+    this.notifyPropertyChange('usableEmotes');
   },
 
   getEmote(code) {

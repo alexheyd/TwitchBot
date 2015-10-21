@@ -1,20 +1,21 @@
+$emoji-selector-height: 175px;
+$emoji-selector-width: 505px;
+
 .emoji-selector {
   position: relative;
-
-  // emoji icon
-  i {
-    cursor: pointer;
-  }
 
   // actual emoji-selector with emoji icons
   ul {
     display: none;
     position: absolute;
-    top: -150px;
-    height: 150px;
+    top: -$emoji-selector-height;
+    left: -$emoji-selector-width + 20px;
+    width: $emoji-selector-width;
+    height: $emoji-selector-height;
     background: #fff;
     overflow: scroll;
     box-shadow: 0 1px 5px #666;
+    padding: 12px;
 
     &.visible {
       display: block;

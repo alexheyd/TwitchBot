@@ -1,16 +1,52 @@
 .twitch-chat {
   width: 100%;
 
+  .fa-star, .fa-star-o:hover,
+  .fa-sticky-note, .fa-sticky-note-o:hover {
+    color: #ffcc00;
+  }
+
   a {
     color: #be6b0a;
   }
 
   .msg-input {
+    position: relative;
     margin-top: 6px;
 
     input {
       width: 100%;
     }
+
+    .emoji-selector {
+      position: absolute;
+      top: 7px;
+      right: 10px;
+    }
+  }
+
+  .jump-to-last-read {
+    position: fixed;
+    margin-top: -13px;
+    width: 505px;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+
+  .jump-to-new {
+    // position: fixed;
+    // margin-top: -13px;
+    width: 505px;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 11px;
   }
 
   .chatbox {
@@ -21,39 +57,39 @@
     height: 38vh;
     // box-shadow: inset 0 0 30px #999;
 
-    .btn-unread {
-      position: fixed;
-      margin: 10px;
-      cursor: pointer;
-    }
-
     .chat-msg {
       width: 99%; // leave space for scrollbar
-      padding: 6px 12px;
-      cursor: pointer;
       background: #ededed;
       border: 1px solid #999;
       box-shadow: 0 3px 3px #999;
       border-radius: 6px;
       margin-bottom: 12px;
+      padding: 6px 0;
 
       // alternate message row colors
       // &:nth-child(even) {
       //   background: #ededed;
       // }
 
-      &:hover, &.last-read {
-        background: #bfc3f0;
+      &.last-read {
+        // background: #acb9cb;
+        background: #d1d1d1;
       }
 
       .msg {
         line-height: 22px;
+        padding: 0 12px;
+        // cursor: pointer;
+
+        // &:hover {
+        //   background: #bfc3f0;
+        // }
       }
 
       .user {
         text-align: right;
         border-bottom: 1px solid $border-color;
-        padding-bottom: 6px;
+        padding: 0 12px 6px;
         margin-bottom: 6px;
         color: $border-color;
 

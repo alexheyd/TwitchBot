@@ -8,6 +8,10 @@ export default Ember.Component.extend({
   emojis: Ember.computed.alias('twitch.usableEmotes'),
   emojiSelectorVisible: false,
 
+  iconClass: Ember.computed('emojiSelectorVisible', function () {
+    return this.get('emojiSelectorVisible') ? 'selected' : '';
+  }),
+
   emojiSelectorClass: Ember.computed('emojiSelectorVisible', function () {
     return (this.get('emojiSelectorVisible')) ? 'visible' : '';
   }),
@@ -21,6 +25,11 @@ export default Ember.Component.extend({
 
     toggleEmojiSelector() {
       this.toggleProperty('emojiSelectorVisible');
+    },
+
+    image404(imgSrc) {
+      let emojiCode = this.$(`img[src="${imgSrc}"]`).parent('li').data('emoji-code');
+      this.get('twitch').removeUsableEmojiByCode(emojiCode);
     }
   }
 });
