@@ -66,6 +66,10 @@
       margin-bottom: 12px;
       padding: 6px 0;
 
+      i {
+        margin-left: 6px;
+      }
+
       // alternate message row colors
       // &:nth-child(even) {
       //   background: #ededed;

@@ -1,8 +1,8 @@
 <div class="user">
-  <a href="{{message.user.url}}" class="user-name" style="color: {{message.user.color}}">{{message.user.displayName}}</a> |
-  <i class="fa fa-clock-o" {{action "timeoutUser" message.user}} /> |
-  <i class="fa {{banIconClass}}" {{action "toggleUserBan" message.user}} /> |
-  <i class="fa {{starIconClass}}" {{action "toggleStarMessage" message}} /> |
+  <a href="{{message.user.url}}" class="user-name" style="color: {{message.user.color}}">{{message.user.displayName}}</a>
+  <i class="fa fa-clock-o" {{action "timeoutUser" message.user}} />
+  <i class="fa {{banIconClass}}" {{action "toggleUserBan" message.user}} />
+  <i class="fa {{starIconClass}}" {{action "toggleStarMessage" message}} />
   <i class="fa {{markAsReadIconClass}}" {{action "markAsLast" message}} />
 </div>
 

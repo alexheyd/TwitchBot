@@ -6,7 +6,7 @@ export default Ember.Service.extend({
   prefs: {
     users: [],
     defaultChannel: '',
-    commandPrefix: '/',
+    commandTrigger: '/',
     viewerTimeoutDuration: 300 // in seconds
   },
 

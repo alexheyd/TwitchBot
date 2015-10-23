@@ -9,7 +9,8 @@ export default Ember.Service.extend({
 
   channel: Ember.computed.alias('settings.prefs.defaultChannel'),
   viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
-  commandPrefix: Ember.computed.alias('settings.prefs.commandPrefix'),
+  commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
+  macroTrigger: '~', // TODO: put this in settings -- maybe change name of "macros"
 
   clients: {},
   clientConfig: {},
@@ -129,7 +130,7 @@ export default Ember.Service.extend({
      */
 
     if (this.isCustomCommand(message)) {
-      this.processCommand(message);
+      this.processCommand(message, user);
     }
 
     // if message is addressed to me specifically
@@ -223,11 +224,11 @@ export default Ember.Service.extend({
   },
 
   isCustomCommand(message) {
-    return message.indexOf(this.get('commandPrefix')) === 0;
+    return message.indexOf(this.get('commandTrigger')) === 0;
   },
 
-  processCommand(command) {
-    this.get('commands').execute(command);
+  processCommand(command, user) {
+    this.get('commands').process(command, user);
   },
 
   getUserProfile(username) {
@@ -276,9 +277,17 @@ export default Ember.Service.extend({
     });
   },
 
+  isMacro(str) {
+    return str.indexOf(this.get('macroTrigger')) === 0;
+  },
+
   say(message) {
     if (this.get('connected')) {
-      this.get('streamer').say(this.get('channel'), message);
+      if (this.isMacro(message)) {
+        this.get('commands').processMacro(message);
+      } else {
+        this.get('streamer').say(this.get('channel'), message);
+      }
     }
   },
 

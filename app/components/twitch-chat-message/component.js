@@ -7,7 +7,7 @@ export default Ember.Component.extend({
 
   actions: {
     markAsLast(message) {
-      this.sendAction('markAsLast', message);
+      this.sendAction('markAsLast', message || this.get('message'));
     },
 
     toggleStarMessage() {
@@ -21,6 +21,16 @@ export default Ember.Component.extend({
 
     toggleUserBan(user) {
       console.log('ban: ', user.username);
+
+      // this.get('dialog').confirm('Are you sure?', {
+      //   labels: {
+      //     yes: 'OK', no: 'Cancel'
+      //   },
+      //
+      //   actions: {
+      //     yes: 'yesAction', no: 'noAction'
+      //   }
+      // }).then(this.ban.bind(this), this.cancelBan.bind(this));
 
       if (this.get('banned')) {
         // this.get('twitch').unban(user.username);
@@ -42,5 +52,9 @@ export default Ember.Component.extend({
 
   banIconClass: Ember.computed('banned', function () {
     return this.get('banned') ? 'fa-unlock' : 'fa-lock';
-  })
+  }),
+
+  doubleClick(event) {
+    this.send('markAsLast');
+  }
 });
