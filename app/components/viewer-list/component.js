@@ -25,8 +25,13 @@ export default Ember.Component.extend({
   }.observes('searchTerm'),
 
   didInsertElement() {
+    setInterval(() => {
+      this.updateViewerList();
+    }, 60000);
+  },
+
+  updateViewerList() {
     this.get('twitch').getViewerList().then(response => {
-      console.log('viewer list response: ', response);
       this.set('viewerCount', response.chatter_count);
       this.set('viewerList', response.chatters.viewers);
       this.set('viewers', response.chatters.viewers);

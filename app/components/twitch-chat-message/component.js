@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 export default Ember.Component.extend({
   classNames: ['chat-msg'],
-  classNameBindings: ['message.lastRead'],
+  classNameBindings: ['message.lastRead', 'message.user.message-type'],
   banned: false,
 
   actions: {

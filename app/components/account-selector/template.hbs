@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-xs-6">
+    <h4>Streamer Account</h4>
+    <select onchange={{action "selectStreamerAccount" value="target.value"}}>
+      <option value="">Select Account</option>
+      {{#each users as |user index|}}
+        <option value={{user.username}} selected={{user.streamer}}>{{user.username}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="col-xs-6">
+    <h4>Bot Account</h4>
+    <select onchange={{action "selectBotAccount" value="target.value"}}>
+      <option value="">Select Account</option>
+      {{#each users as |user index|}}
+        <option value={{user.username}} selected={{user.bot}}>{{user.username}}</option>
+      {{/each}}
+    </select>
+  </div>
+</div>

@@ -1,56 +1,30 @@
-<div class="row">
-  <div class="col-xs-12">
-    <h2>Settings</h2>
-  </div>
-</div>
+{{page-header title="Settings"}}
 
-<div class="row">
-  <div class="col-xs-12">
-    <h3>New User</h3>
+{{account-selector}}
 
-    <div class="add-user">
-      {{input type="text" class="new-username" value=newUsername placeholder="Username" enter="addUser"}}
-      {{input type="text" class="new-oauth" value=newOauth placeholder="OAuth Token" enter="addUser"}}
+{{new-user}}
 
-      <button class="btn btn-primary" {{action "addUser"}}>Add</button>
-    </div>
-  </div>
-</div>
+{{user-manager}}
 
-<div class="row">
-  <div class="users col-xs-12">
-    <h3>Current Users</h3>
-
-    {{#each users as |user index|}}
-      <div class="user">
-        {{input type="text" value=user.username focus-out="save"}} {{input type="text" value=user.oauth focus-out="save"}} <button class="btn btn-danger" {{action "removeUser" user}}>Delete</button>
-      </div>
-    {{else}}
-      <div class="no-users">
-        No users added yet.
-      </div>
-    {{/each}}
-  </div>
-</div>
-
+{{page-header title="General Options" subheader="true"}}
 <div class="row">
   <div class="col-xs-3">
-    <h3>Default Channel</h3>
+    <h4>Default Channel</h4>
     {{input type="text" focus-out="save" value=defaultChannel}}
   </div>
 
   <div class="col-xs-3">
-    <h3>Timeout Duration</h3>
+    <h4>Timeout Duration</h4>
     {{input type="text" focus-out="save" value=viewerTimeoutDuration}}
   </div>
 
   <div class="col-xs-3">
-    <h3>Command Trigger</h3>
+    <h4>Command Trigger</h4>
     {{input type="text" focus-out="save" value=commandTrigger}}
   </div>
 
   <div class="col-xs-3">
-    <h3>Macro Trigger</h3>
+    <h4>Macro Trigger</h4>
     {{input type="text" focus-out="save" value=macroTrigger}}
   </div>
 </div>

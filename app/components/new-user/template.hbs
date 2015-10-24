@@ -1,0 +1,12 @@
+<div class="row">
+  <div class="col-xs-12">
+    <h3>New User</h3>
+
+    <div class="add-user">
+      {{input type="text" class="new-username" value=newUsername placeholder="Username" enter="addUser"}}
+      {{input type="text" class="new-oauth" value=newOauth placeholder="OAuth Token" enter="addUser"}}
+
+      <button class="btn btn-primary" {{action "addUser"}}>Add</button>
+    </div>
+  </div>
+</div>

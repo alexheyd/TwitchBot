@@ -10,15 +10,23 @@ export default Ember.Service.extend({
 
   rules: {
     hello: {
-      permission: 'all', // all, followers, subs, mods, me
-      command(msg) {
+      permissions: 'all', // all, followers, subs, mods, me
+      handler(msg) {
         this.botSay('hello, ' + msg);
       }
     },
 
+    slap: {
+      permissions: 'all',
+      handler(name) {
+        this.botAction(`slaps ${name} across the face with a trout.`);
+        this.botSay(`Know your role, ${name}.`);
+      }
+    },
+
     poll: {
-      permission: 'me',
-      command() {
+      permissions: 'me',
+      handler() {
         let args = Array.prototype.slice.call(arguments);
         let question = args.shift();
         let answers = '';
@@ -40,7 +48,12 @@ export default Ember.Service.extend({
   },
 
   botSay(msg) {
+    // this.get('twitch').botSay(msg);
     this.get('bot').say(this.get('twitch.channel'), msg);
+  },
+
+  botAction(msg) {
+    this.get('bot').action(this.get('twitch.channel'), msg);
   },
 
   processCommand(message, user) {
@@ -50,35 +63,56 @@ export default Ember.Service.extend({
 
   processMacro(message) {
     let command = this.processMessage(message, this.get('macroTrigger'));
-    this.execute(command.name, command.params);
+    this.executeMacro(command.name, command.params);
   },
 
   processMessage(message, trigger) {
-    // remove command trigger
+    // strip command or macro trigger
     message = message.replace(trigger, '');
 
-    // split on spaces except those within quotes
-    let messageParts = message.match(/(?:[^\s"]+|"[^"]*")+/g);
-
-    // remove double quotes
-    messageParts = messageParts.map((item) => {
+    // split on spaces except those within quotes, and strip out double quotes
+    let messageParts = message.match(/(?:[^\s"]+|"[^"]*")+/g).map((item) => {
       return item.replace(/"/g, '');
     });
 
     // command name is the first message part, the rest are command params
     let commandName = messageParts.shift();
-    let commandRules = this.getRules(commandName);
+    let commandRules = this.getRules(commandName) || {};
 
     // TODO: implement permissions
     commandRules.allowed = true;
     commandRules.name = commandName;
+    commandRules.params = messageParts;
 
     return commandRules;
   },
 
   execute(commandName, params, user) {
     let command = this.getRules(commandName);
-    command.handler.apply(this, params);
+
+    if (command) {
+      command.handler.apply(this, params);
+    }
+  },
+
+  executeMacro(macroName, params) {
+    let macro = this.getMacro(macroName);
+
+    if (macro) {
+      macro.apply(this, params);
+    }
+  },
+
+  isMacroOrCommand(message) {
+    return this.isMacro(message) || this.isCustomCommand(message);
+  },
+
+  isMacro(message) {
+    return message.indexOf(this.get('macroTrigger')) === 0;
+  },
+
+  isCustomCommand(message) {
+    return message.indexOf(this.get('commandTrigger')) === 0;
   },
 
   isValidCommandRules(rules) {

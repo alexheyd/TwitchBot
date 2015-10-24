@@ -12,22 +12,11 @@ export default Ember.Component.extend({
   classNames: ['settings'],
   newUsername: null,
   newOauth: null,
+  mainAccount: null,
 
   actions: {
     save() {
       this.save();
-    },
-
-    addUser() {
-      this.addUser();
-    },
-
-    editUser(userIndex) {
-      this.editUser(userIndex);
-    },
-
-    removeUser(user) {
-      this.removeUser(user);
     }
   },
 
@@ -37,36 +26,5 @@ export default Ember.Component.extend({
 
   didInsertElement() {
     this.get('settings').load();
-  },
-
-  addUser() {
-    let newUsername = this.get('newUsername');
-    let newOauth = this.get('newOauth');
-    let settings = this.get('settings');
-
-    if (!newUsername || !newOauth) {
-      return;
-    }
-
-    if (!settings.findUser(newUsername)) {
-      settings.addUser({
-        username: newUsername, oauth: newOauth
-      });
-
-      this.set('newUsername', '');
-      this.set('newOauth', '');
-      this.$('input.new-username').focus();
-
-      this.save();
-    }
-  },
-
-  editUser(user) {
-    this.get('settings').editUser(user);
-  },
-
-  removeUser(user) {
-    this.get('settings').removeUser(user);
-    this.save();
   }
 });

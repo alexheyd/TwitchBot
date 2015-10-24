@@ -2,31 +2,28 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
   settings: Ember.inject.service(),
-  commands: Ember.inject.service(),
+  commander: Ember.inject.service(),
+  emotes: Ember.inject.service(),
 
   channel: Ember.computed.alias('settings.prefs.defaultChannel'),
   viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
   commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
   macroTrigger: Ember.computed.alias('settings.prefs.macroTrigger'),
+  streamerName: Ember.computed.alias('settings.prefs.streamerName'),
+  botName: Ember.computed.alias('settings.prefs.botName'),
 
   clients: {},
   clientConfig: {},
   connected: false,
   connecting: false,
-  fetchingEmotes: false,
   chatroom: [],
   mentions: [],
-  emotes: null,
-  usableEmotes: null,
-  usableEmoteCount: 0,
-  streamerName: 'GhostCryptology',
-  botName: 'DevourBot',
 
-  streamer: Ember.computed('streamer', function () {
+  streamer: Ember.computed('streamerName', function () {
     return this.get('clients.' + this.get('streamerName'));
   }),
 
-  bot: Ember.computed('streamer', function () {
+  bot: Ember.computed('botName', function () {
     return this.get('clients.' + this.get('botName'));
   }),
 
@@ -45,17 +42,18 @@ export default Ember.Service.extend({
       password: null
     },
 
-    channels: ['#GhostCryptology']
+    channels: [''] // set during init
   },
 
   init() {
+    this.get('defaultOptions.channels').pushObject(`#${this.get('channel')}`);
     this.createUserClientConfigs();
     this.createClients();
     this.bindTwitchEvents();
   },
 
   createUserClientConfigs() {
-    this.get('settings').getUsers().forEach(this.createClientConfig.bind(this));
+    this.get('settings').get('users').forEach(this.createClientConfig.bind(this));
   },
 
   createClientConfig(user) {
@@ -80,25 +78,7 @@ export default Ember.Service.extend({
     let streamerClient = this.get('streamer');
 
     streamerClient.on('chat', this.onChatReceived.bind(this));
-    streamerClient.on('emotesets', this.onEmoteSets.bind(this));
-  },
-
-  onEmoteSets(sets) {
-    let promises = [this.api('/chat/emoticon_images').then(this.processEmoteResponse.bind(this)), this.api(`/chat/emoticon_images?emotesets=${sets}`).then(this.processUsableEmoteResponse.bind(this))];
-
-    this.set('fetchingEmotes', true);
-
-    Ember.RSVP.all(promises).then(() => {
-      this.set('fetchingEmotes', false);
-    });
-  },
-
-  processEmoteResponse(response) {
-    this.saveEmotes(response.emoticons);
-  },
-
-  processUsableEmoteResponse(response) {
-    this.extractUsableEmotes(response.emoticon_sets);
+    streamerClient.on('action', this.onChatReceived.bind(this));
   },
 
   onConnecting() {
@@ -111,6 +91,8 @@ export default Ember.Service.extend({
   },
 
   onChatReceived(channel, user, message/*, self*/) {
+    if (!message) return;
+
     console.log('chat received from user: ', user);
     /*
       ## USER OBJECT ##
@@ -126,8 +108,9 @@ export default Ember.Service.extend({
       username: "dcryptzero"
      */
 
-    if (this.isCustomCommand(message)) {
-      this.processCommand(message, user);
+    let commander = this.get('commander');
+    if (commander.isCustomCommand(message)) {
+      commander.processCommand(message, user);
     }
 
     // if message is addressed to me specifically
@@ -135,8 +118,8 @@ export default Ember.Service.extend({
       this.saveMention({ content: message, user: user });
     }
 
-    user.url = this.getUserProfile(user.username);
-    user.displayName = user['display-name'];
+    Ember.set(user, 'url', this.getUserProfile(user.username));
+    Ember.set(user, 'displayName', user['display-name']);
 
     // NOTE: this is basically the chat message "model"
     // TODO: abstract the chat message "model"
@@ -152,62 +135,6 @@ export default Ember.Service.extend({
       .replace(/'/g, '&#039;');
   },
 
-  extractUsableEmotes(emoteSets) {
-    let fullSet = [];
-
-    for (let id in emoteSets) {
-      fullSet.push(emoteSets[id]);
-    }
-
-    let flatSet = [].concat.apply([], fullSet);
-    this.set('usableEmoteCount', flatSet.length);
-    this.saveUsableEmotes(flatSet);
-  },
-
-  extractEmotes(emotes) {
-    let savedEmotes = {};
-
-    emotes.forEach(emote => {
-      if (typeof emote === 'object') {
-        savedEmotes[emote.code] = {
-          id: emote.id, imageUrl: `http://static-cdn.jtvnw.net/emoticons/v1/${emote.id}/1.0`
-        };
-      } else if (Ember.isArray(emote)) {
-        savedEmotes = this.extractEmotes(emote);
-      }
-    });
-
-    return savedEmotes;
-  },
-
-  saveUsableEmotes(emotes) {
-    let usableEmotes = this.extractEmotes(emotes);
-    this.set('usableEmotes', usableEmotes);
-
-    console.log('usable emotes: ', usableEmotes);
-  },
-
-  saveEmotes(emotes) {
-    let allEmotes = this.extractEmotes(emotes);
-    this.set('emotes', allEmotes);
-
-    console.log('allEmotes: ', allEmotes);
-  },
-
-  removeUsableEmojiByCode(code) {
-    delete this.usableEmotes[code];
-    this.notifyPropertyChange('usableEmotes');
-  },
-
-  getEmote(code) {
-    return this.get('emotes.' + code) || null;
-  },
-
-  isEmote(str) {
-    let emotes = this.get('emotes');
-    return (emotes && typeof emotes[str] !== 'undefined');
-  },
-
   captureChat(message) {
     this.get('chatroom').pushObject(message);
   },
@@ -218,14 +145,6 @@ export default Ember.Service.extend({
 
   hasMention(message) {
     return (message.toLowerCase().indexOf('@' + this.get('streamerName').toLowerCase()) > -1);
-  },
-
-  isCustomCommand(message) {
-    return message.indexOf(this.get('commandTrigger')) === 0;
-  },
-
-  processCommand(command, user) {
-    this.get('commands').processCommand(command, user);
   },
 
   getUserProfile(username) {
@@ -274,17 +193,9 @@ export default Ember.Service.extend({
     });
   },
 
-  isMacro(str) {
-    return str.indexOf(this.get('macroTrigger')) === 0;
-  },
-
   say(message) {
     if (this.get('connected')) {
-      if (this.isMacro(message)) {
-        this.get('commands').processMacro(message);
-      } else {
-        this.get('streamer').say(this.get('channel'), message);
-      }
+      this.get('streamer').say(this.get('channel'), message);
     }
   },
 

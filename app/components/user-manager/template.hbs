@@ -1,0 +1,25 @@
+{{page-header title="Manage Users" subheader="true"}}
+
+<div class="row">
+  <div class="col-xs-12">
+    {{#each users as |user index|}}
+      <div class="row">
+        <div class="user col-xs-4">
+          {{input type="text" value=user.username focus-out="save"}}
+        </div>
+
+        <div class="oauth col-xs-4">
+          {{input type="text" value=user.oauth focus-out="save"}}
+        </div>
+
+        <div class="button col-xs-4">
+          <button class="btn btn-danger" {{action "removeUser" user}}>Delete</button>
+        </div>
+      </div>
+    {{else}}
+      <div class="no-users">
+        No users added yet.
+      </div>
+    {{/each}}
+  </div>
+</div>

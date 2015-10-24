@@ -4,20 +4,14 @@ export default Ember.Component.extend({
   classNames: ['twitch-chat', 'row'],
 
   twitch: Ember.inject.service(),
+  commander: Ember.inject.service(),
 
   autoScroll: true,
-
   newMessages: false,
-
-  lastReadIndex: null,
-
-  chatInput: '',
-
   enableChatInput: false,
-
   enableViewerList: false,
-
   lastReadMarkerSet: false,
+  chatInput: '',
 
   actions: {
     useEmoji(code) {
@@ -42,9 +36,17 @@ export default Ember.Component.extend({
 
     say() {
       let chatInput = this.get('chatInput');
+      let commander = this.get('commander');
 
       if (chatInput) {
-        this.get('twitch').say(chatInput);
+        if (commander.isMacro(chatInput)) {
+          commander.processMacro(chatInput);
+        } else if (commander.isCustomCommand(chatInput)) {
+          commander.processCommand(chatInput);
+        } else {
+          this.get('twitch').say(chatInput);
+        }
+
         this.set('chatInput', '');
       }
     }
@@ -88,9 +90,9 @@ export default Ember.Component.extend({
 
       // check each word in the message
       words.forEach(word => {
-        if (this.get('twitch').isEmote(word)) {
+        if (this.get('twitch.emotes').isEmote(word)) {
           // create emoji image tag
-          word = `<img src="${this.get('twitch').getEmote(word).imageUrl}" />`;
+          word = `<img src="${this.get('twitch.emotes').getEmote(word).imageUrl}" />`;
         }
 
         newMessage.push(word);
