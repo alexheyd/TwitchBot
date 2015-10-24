@@ -1,8 +1,5 @@
 import Ember from 'ember';
 
-// devourssugar
-// oauth:2cu4zj8g78ke14agoi52g5z2l1fn0j
-
 export default Ember.Service.extend({
   settings: Ember.inject.service(),
   commands: Ember.inject.service(),
@@ -10,7 +7,7 @@ export default Ember.Service.extend({
   channel: Ember.computed.alias('settings.prefs.defaultChannel'),
   viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
   commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
-  macroTrigger: '~', // TODO: put this in settings -- maybe change name of "macros"
+  macroTrigger: Ember.computed.alias('settings.prefs.macroTrigger'),
 
   clients: {},
   clientConfig: {},
@@ -228,7 +225,7 @@ export default Ember.Service.extend({
   },
 
   processCommand(command, user) {
-    this.get('commands').process(command, user);
+    this.get('commands').processCommand(command, user);
   },
 
   getUserProfile(username) {

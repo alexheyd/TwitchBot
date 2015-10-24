@@ -6,6 +6,7 @@ export default Ember.Component.extend({
   users: Ember.computed.alias('settings.prefs.users'),
   defaultChannel: Ember.computed.alias('settings.prefs.defaultChannel'),
   commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
+  macroTrigger: Ember.computed.alias('settings.prefs.macroTrigger'),
   viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
 
   classNames: ['settings'],
