@@ -18,6 +18,7 @@ export default Ember.Service.extend({
   connecting: false,
   chatroom: [],
   mentions: [],
+  starred: [],
 
   streamer: Ember.computed('streamerName', function () {
     return this.get('clients.' + this.get('streamerName'));
@@ -91,7 +92,9 @@ export default Ember.Service.extend({
   },
 
   onChatReceived(channel, user, message/*, self*/) {
-    if (!message) return;
+    if (!message) {
+      return;
+    }
 
     console.log('chat received from user: ', user);
     /*
@@ -109,6 +112,7 @@ export default Ember.Service.extend({
      */
 
     let commander = this.get('commander');
+
     if (commander.isCustomCommand(message)) {
       commander.processCommand(message, user);
     }
@@ -123,7 +127,14 @@ export default Ember.Service.extend({
 
     // NOTE: this is basically the chat message "model"
     // TODO: abstract the chat message "model"
-    this.captureChat({ content: this.escapeHtml(message), user: user, starred: false });
+    let msg = {
+      content: this.escapeHtml(message),
+      user: user,
+      starred: false,
+      index: this.get('chatroom').length
+    };
+
+    this.captureChat(msg);
   },
 
   escapeHtml(unsafe) {
@@ -155,6 +166,17 @@ export default Ember.Service.extend({
     return this.api('http://tmi.twitch.tv/group/user/ghostcryptology/chatters').then(response => {
       return response.data;
     });
+  },
+
+  toggleStarMessage(message) {
+    let starredMessages = this.get('starred');
+    let starred = starredMessages.findBy('index', message.index);
+
+    if (starred) {
+      starredMessages.removeObject(starred);
+    } else {
+      starredMessages.pushObject(message);
+    }
   },
 
 /*******************************************************************************

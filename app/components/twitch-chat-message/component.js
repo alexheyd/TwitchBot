@@ -1,6 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
+  twitch: Ember.inject.service(),
   classNames: ['chat-msg'],
   classNameBindings: ['message.lastRead', 'message.user.message-type'],
   banned: false,
@@ -12,6 +13,7 @@ export default Ember.Component.extend({
 
     toggleStarMessage() {
       this.toggleProperty('message.starred');
+      this.get('twitch').toggleStarMessage(this.get('message'));
     },
 
     timeoutUser(user) {
@@ -54,7 +56,7 @@ export default Ember.Component.extend({
     return this.get('banned') ? 'fa-unlock' : 'fa-lock';
   }),
 
-  doubleClick(event) {
+  doubleClick() {
     this.send('markAsLast');
   }
 });

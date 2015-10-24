@@ -12,6 +12,7 @@ Router.map(function () {
   this.route('lists');
   this.route('loyalty');
   this.route('dev');
+  this.route('starred', {});
 });
 
 export default Router;
