@@ -43,7 +43,7 @@ export default Ember.Service.extend({
   },
 
   createClient(user) {
-    let username = user.username
+    let username = user.username;
     let channel = this.get('channel');
 
     this.set(`clients.${username}`, TwitchClient.create({
