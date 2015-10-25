@@ -2,6 +2,24 @@ import Ember from 'ember';
 
 // proxy to irc.client object with some properties for status tracking
 export default Ember.Object.extend({
+  defaults: {
+    options: {
+      debug: true
+    },
+
+    connection: {
+      random: 'chat',
+      reconnect: true
+    },
+
+    identity: {
+      username: null,
+      password: null
+    },
+
+    channels: [''] // set during init
+  },
+
   client: null,
   connected: false,
   connecting: false,
@@ -44,7 +62,8 @@ export default Ember.Object.extend({
   }),
 
   init() {
-    let config = this.get('config');
+    let config = Ember.$.extend({}, this.get('defaults'), this.get('config'));
+    this.set('config', config);
 
     if (!config) {
       console.error('TwitchClient requires a config object.');

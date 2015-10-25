@@ -29,60 +29,37 @@ export default Ember.Service.extend({
     return this.get('clients.' + this.get('botName'));
   }),
 
-  defaultOptions: {
-    options: {
-      debug: true
-    },
-
-    connection: {
-      random: 'chat',
-      reconnect: true
-    },
-
-    identity: {
-      username: null,
-      password: null
-    },
-
-    channels: [''] // set during init
-  },
-
   init() {
-    this.get('defaultOptions.channels').pushObject(`#${this.get('channel')}`);
-    this.createUserClientConfigs();
     this.createClients();
     this.bindTwitchEvents();
   },
 
-  createUserClientConfigs() {
-    this.get('settings').get('users').forEach(this.createClientConfig.bind(this));
-  },
-
-  createClientConfig(user) {
-    let config = Ember.$.extend({}, this.get('defaultOptions'));
-
-    config.identity = {
-      username: user.username, password: user.oauth
-    };
-
-    this.set('clientConfig.' + user.username, config);
-  },
-
   createClients() {
-    let clientConfig = this.get('clientConfig');
+    let users = this.get('settings').get('users');
 
-    for (let key in clientConfig) {
-      // create TwitchClient proxy to irc.client()
-      this.set(`clients.${key}`, TwitchClient.create({
-        config: clientConfig[key], channel: this.get('channel')
-      }));
+    this.set('clientCount', users.length);
 
-      // add observers for connecting and connected status
-      Ember.addObserver(this, `clients.${key}.connected`, this.onClientConnectionChange.bind(this));
-      Ember.addObserver(this, `clients.${key}.connecting`, this.onClientConnectionChange.bind(this));
+    users.forEach(this.createClient.bind(this));
+  },
 
-      this.incrementProperty('clientCount');
-    }
+  createClient(user) {
+    let username = user.username
+    let channel = this.get('channel');
+
+    this.set(`clients.${username}`, TwitchClient.create({
+      channel: channel,
+      config: {
+        identity: {
+          username: username, password: user.oauth
+        },
+
+        channels: [channel],
+      }
+    }));
+
+    // add observers for connecting and connected status
+    Ember.addObserver(this, `clients.${username}.connected`, this.onClientConnectionChange.bind(this));
+    Ember.addObserver(this, `clients.${username}.connecting`, this.onClientConnectionChange.bind(this));
   },
 
   onClientConnectionChange() {
@@ -117,15 +94,6 @@ export default Ember.Service.extend({
     // streamerClient.on('connecting', this.onConnecting.bind(this));
     // streamerClient.on('disconnected', this.onDisconnected.bind(this));
   },
-
-  // onConnecting() {
-  //   this.set('connecting', true);
-  // },
-  //
-  // onConnected() {
-  //   this.set('connecting', false);
-  //   this.set('connected', true);
-  // },
 
   onChatReceived(channel, user, message/*, self*/) {
     if (!message) {

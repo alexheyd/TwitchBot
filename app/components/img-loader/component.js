@@ -9,8 +9,6 @@ export default Ember.Component.extend({
   },
 
   onImgLoadError() {
-    console.log('onImgLoadError');
     this.sendAction('image404', this.get('src'));
-    // this.destroy();
   }
 });
