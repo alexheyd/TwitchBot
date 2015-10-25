@@ -1,12 +1,17 @@
-{{page-header title="Control Center"}}
-
-<div class="row">
+<div class="row control-center">
   <div class="col-xs-12">
-    <h4>Channel</h4>
-    {{input type="text" value=channel}} <button class="btn btn-primary" {{action "joinChannel"}}>Join</button>
+    <h3>Control Center</h3>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <h4>Channel</h4>
+        {{input type="text" value=channel}} <button class="btn btn-primary" {{action "joinChannel"}}>Join</button>
+      </div>
+    </div>
+
+    {{account-selector}}
+
+    {{connection-status}}
+
   </div>
 </div>
-
-{{account-selector}}
-
-{{connection-status}}

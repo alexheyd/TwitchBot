@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames: ['control-center'],
+  tagName: '',
   twitch: Ember.inject.service(),
   settings: Ember.inject.service(),
   notifications: Ember.inject.service(),

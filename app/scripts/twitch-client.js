@@ -96,25 +96,25 @@ export default Ember.Object.extend({
   },
 
   onConnecting() {
-    console.log(`${this.get('clientName')} connecting...`);
     this.set('connecting', true);
     this.set('connected', false);
   },
 
   onConnected() {
-    console.log(`${this.get('clientName')} connected!!!`);
     this.set('connecting', false);
     this.set('connected', true);
   },
 
   onDisconnected() {
-    console.log(`${this.get('clientName')} disconnected`);
     this.set('connected', false);
   },
 
   connect() {
-    console.log(`${this.get('clientName')} initiating connection...`);
     return this.get('client').connect();
+  },
+
+  disconnect() {
+    return this.get('client').disconnect();
   },
 
   say(message) {

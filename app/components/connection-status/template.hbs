@@ -1,18 +1,27 @@
-{{page-header title="Connection Status" subtitle="true"}}
+<div class="row connection-status">
+  <div class="col-xs-12">
+    <h3>Connection Status</h3>
 
-<div class="row">
-  {{#each-in clients as |clientName client|}}
-    <div class="col-xs-{{clientCount}} client-connection-status">
-      <h4>
-        <i class="fa {{client.iconClass}}" />
-        {{clientName}}
-      </h4>
-      <span>Status: {{client.status}}</span>
+    <div class="row">
+      {{#each-in clients as |clientName client|}}
+        <div class="col-xs-{{clientColWidth}} client-connection-status">
+          <h4>
+            <i class="fa {{client.iconClass}}" />
+            {{clientName}}
+          </h4>
 
-      <div class="client-actions">
-        <button class="btn btn-primary" {{action "connect" client}}>Connect</button>
-        <button class="btn btn-danger" {{action "disconnect" client}}>Disconnect</button>
-      </div>
+          <span>Status: {{client.status}}</span>
+
+          <div class="client-actions">
+            {{#if client.connected}}
+              <button class="btn btn-danger" {{action "disconnect" client}}>Disconnect</button>
+            {{else}}
+              <button class="btn btn-primary" {{action "connect" client}}>Connect</button>
+            {{/if}}
+          </div>
+        </div>
+      {{/each-in}}
     </div>
-  {{/each-in}}
+
+  </div>
 </div>
