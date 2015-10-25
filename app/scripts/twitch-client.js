@@ -117,7 +117,7 @@ export default Ember.Object.extend({
   },
 
   say(channel, message) {
-    console.log(`${this.get('clientName')} SAY: ${message} on ${channel}`);
+    // console.log(`${this.get('clientName')} SAY: ${message} on ${channel}`);
     return this.get('client').say(channel, message);
   },
 
@@ -143,12 +143,12 @@ export default Ember.Object.extend({
   },
 
   join(channel) {
-    console.log(`${this.get('clientName')} JOIN CHANNEL: ${channel}`);
+    // console.log(`${this.get('clientName')} JOIN CHANNEL: ${channel}`);
     return this.get('client').join(channel);
   },
 
   part(channel) {
-    console.log(`${this.get('clientName')} PART CHANNEL: ${channel}`);
+    // console.log(`${this.get('clientName')} PART CHANNEL: ${channel}`);
     return this.get('client').part(channel);
   },
 

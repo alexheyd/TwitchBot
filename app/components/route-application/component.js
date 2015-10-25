@@ -34,7 +34,7 @@ export default Ember.Component.extend({
   // END DEV CODE
   //************************************************************************
 
-  onTwitchConnection: function () {
+  onTwitchConnection: Ember.observer('twitch.connecting', function () {
     let connecting = this.get('twitch.connecting');
 
     if (connecting) {
@@ -42,9 +42,9 @@ export default Ember.Component.extend({
     } else {
       this.get('notifications').remove();
     }
-  }.observes('twitch.connecting').on('didInsertElement'),
+  }),
 
-  onFetchingEmotes: function () {
+  onFetchingEmotes: Ember.observer('twitch.emotes.fetchingEmotes', function () {
     let fetchingEmotes = this.get('twitch.emotes.fetchingEmotes');
 
     if (fetchingEmotes) {
@@ -60,6 +60,5 @@ export default Ember.Component.extend({
 
       this.get('notifications').remove();
     }
-
-  }.observes('twitch.emotes.fetchingEmotes').on('didInsertElement')
+  })
 });

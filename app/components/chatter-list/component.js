@@ -5,7 +5,11 @@ export default Ember.Component.extend({
 
   twitch: Ember.inject.service(),
 
-  updateViewerListInterval: 60000, // TODO: put in settings
+  onChannelChange: Ember.observer('twitch.channel', function () {
+    this.updateList();
+  }),
+
+  updateChatterListInterval: 60000, // TODO: put in settings
 
   viewerCount: 0,
 
@@ -15,7 +19,9 @@ export default Ember.Component.extend({
 
   viewers: [],
 
-  onSearchTermChanged: function () {
+  updateListTimer: null,
+
+  onSearchTermChanged: Ember.observer('searchTerm', function () {
     let searchTerm = this.get('searchTerm');
     let viewers = this.get('viewerList');
 
@@ -24,22 +30,33 @@ export default Ember.Component.extend({
     });
 
     this.set('viewers', viewers);
-  }.observes('searchTerm'),
+  }),
 
   didInsertElement() {
     this.updateList();
   },
 
   updateList() {
-    this.updateViewerList();
-    Ember.run.later(this, this.updateList, this.get('updateViewerListInterval'));
+    let timer = this.get('updateListTimer');
+
+    if (timer) {
+      Ember.run.cancel(timer);
+    }
+
+    this.updateChatterList();
+    this.set('updateListTimer', Ember.run.later(this, this.updateList, this.get('updateChatterListInterval')));
   },
 
-  updateViewerList() {
-    this.get('twitch').getViewerList().then(response => {
-      this.set('viewerCount', response.chatter_count);
-      this.set('viewerList', response.chatters.viewers);
-      this.set('viewers', response.chatters.viewers);
+  updateChatterList() {
+    this.get('twitch').getChatterList().then(response => {
+      if (response) {
+        console.log('chatter list: ', response);
+        let allViewers = response.chatters.viewers.concat(response.chatters.moderators);
+
+        this.set('viewerCount', response.chatter_count);
+        this.set('viewerList', allViewers);
+        this.set('viewers', allViewers);
+      }
     });
   }
 });

@@ -74,9 +74,9 @@ export default Ember.Component.extend({
     this.convertEmojis();
   },
 
-  onMessageAdded: function () {
+  onMessageAdded: Ember.observer('messages.[]', function () {
     this.set('newMessages', !this.isScrolledToBottom());
-  }.observes('messages.[]'),
+  }),
 
   convertEmojis() {
     let msgs = this.get('messages');

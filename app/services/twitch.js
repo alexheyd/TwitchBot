@@ -14,7 +14,7 @@ export default Ember.Service.extend({
   botName: Ember.computed.alias('settings.prefs.botName'),
 
   followerUpdateInterval: '60000', // TODO: add to settings
-  // followerUpdatePoll: null,
+  updateFollowerTimer: null,
   lastFollowerUpdate: null,
   newFollowerCount: 0,
 
@@ -73,12 +73,12 @@ export default Ember.Service.extend({
     Ember.addObserver(this, `clients.${username}.connecting`, this.onClientConnectionChange.bind(this));
   },
 
-  onAllConnected: function () {
+  onAllConnected: Ember.observer('connected', function () {
     if (this.get('connected')) {
       // starts a poll
       this.updateFollowers();
     }
-  }.observes('connected').on('init'),
+  }),
 
   onClientConnectionChange() {
     let allConnected = true;
@@ -185,14 +185,17 @@ export default Ember.Service.extend({
     return 'http://www.twitch.tv/' + username;
   },
 
-  getViewerList() {
-    return this.api(`http://tmi.twitch.tv/group/user/${this.get('streamerName').toLowerCase()}/chatters`).then(response => {
+  getChatterList() {
+    let channel = this.get('channel').replace('#', '').toLowerCase();
+
+    return this.api(`http://tmi.twitch.tv/group/user/${channel}/chatters`).then(response => {
       return response.data;
     });
   },
 
   getFollowers() {
-    return this.api(`https://api.twitch.tv/kraken/channels/${this.get('streamerName').toLowerCase()}/follows/?limit=100`).then(response => {
+    let streamerName = this.get('streamerName').toLowerCase();
+    return this.api(`https://api.twitch.tv/kraken/channels/${streamerName}/follows/?limit=100`).then(response => {
       console.log('getFollowers() response: ', response);
       return response;
     });
@@ -214,8 +217,14 @@ export default Ember.Service.extend({
   },
 
   updateFollowers() {
+    let timer = this.get('updateFollowerTimer');
+
+    if (timer) {
+      Ember.run.cancel(timer);
+    }
+
     this.updateFollowerData();
-    Ember.run.later(this, this.updateFollowers, this.get('followerUpdateInterval'));
+    this.set('updateFollowerTimer', Ember.run.later(this, this.updateFollowers, this.get('followerUpdateInterval')));
   },
 
   updateFollowerData() {
