@@ -3,7 +3,9 @@ var EmberApp = require('ember-cli/lib/broccoli/ember-app');
 
 module.exports = function(defaults) {
   var app = new EmberApp(defaults, {
-    // Add options here
+    vendorFiles: {
+      'handlebars.js': null // prevent ember-cli from app.import'ing this, ¡VIVA HTMLBARS!
+    }
   });
 
   // Use `app.import` to add additional libraries to the generated
@@ -18,6 +20,8 @@ module.exports = function(defaults) {
   // modules that you would like to import into your application
   // please specify an object with the list of modules as keys
   // along with the exports of each module as its value.
+
+  app.import('bower_components/moment/moment.js');
 
   return app.toTree();
 };

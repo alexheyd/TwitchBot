@@ -13,6 +13,11 @@ export default Ember.Service.extend({
   streamerName: Ember.computed.alias('settings.prefs.streamerName'),
   botName: Ember.computed.alias('settings.prefs.botName'),
 
+  followerUpdateInterval: '60000', // TODO: add to settings
+  followerUpdatePoll: null,
+  lastFollowerUpdate: null,
+  newFollowerCount: 0,
+
   clients: {},
   clientCount: 0,
   clientConfig: {},
@@ -20,6 +25,11 @@ export default Ember.Service.extend({
   chatroom: [],
   mentions: [],
   starred: [],
+  latestSubs: [],
+  lastKnownSub: '',
+  latestFollowers: [],
+  lastKnownFollower: '',
+  followerCount: 0,
 
   streamer: Ember.computed('streamerName', function () {
     return this.get('clients.' + this.get('streamerName'));
@@ -63,6 +73,13 @@ export default Ember.Service.extend({
     Ember.addObserver(this, `clients.${username}.connecting`, this.onClientConnectionChange.bind(this));
   },
 
+  onAllConnected: function () {
+    if (this.get('connected')) {
+      // starts a poll
+      this.startFollowerUpdatePoll();
+    }
+  }.observes('connected').on('init'),
+
   onClientConnectionChange() {
     let allConnected = true;
     let stillConnecting = false;
@@ -87,13 +104,14 @@ export default Ember.Service.extend({
 
     streamerClient.on('chat', this.onChatReceived.bind(this));
     streamerClient.on('action', this.onChatReceived.bind(this));
-    // streamerClient.on('subscription', this.onNewSubcriber.bind(this));
+    streamerClient.on('subscription', this.onNewSubcriber.bind(this));
     // streamerClient.on('join', this.onChannelJoin.bind(this));
     // streamerClient.on('mods', this.onModListReceived.bind(this));
     // streamerClient.on('notice', this.onTwitchNoticeReceived.bind(this));
-    //
-    // streamerClient.on('connecting', this.onConnecting.bind(this));
-    // streamerClient.on('disconnected', this.onDisconnected.bind(this));
+  },
+
+  onNewSubcriber(username) {
+    this.get('latestSubs').pushObject(username);
   },
 
   onChatReceived(channel, user, message/*, self*/) {
@@ -168,8 +186,15 @@ export default Ember.Service.extend({
   },
 
   getViewerList() {
-    return this.api('http://tmi.twitch.tv/group/user/ghostcryptology/chatters').then(response => {
+    return this.api(`http://tmi.twitch.tv/group/user/${this.get('streamerName').toLowerCase()}/chatters`).then(response => {
       return response.data;
+    });
+  },
+
+  getFollowers() {
+    return this.api(`https://api.twitch.tv/kraken/channels/${this.get('streamerName').toLowerCase()}/follows/?limit=100`).then(response => {
+      console.log('getFollowers() response: ', response);
+      return response;
     });
   },
 
@@ -184,8 +209,68 @@ export default Ember.Service.extend({
     }
   },
 
+  addLatestFollower(username) {
+    this.get('latestFollowers').pushObject(username);
+  },
+
+  startFollowerUpdatePoll() {
+    let updateData = () => {
+      this.updateFollowerData().then(this.startFollowerUpdatePoll.bind(this));
+    };
+
+    let startTimer = () => {
+      console.log('>>> Start Follower Update Poll Timer');
+      this.set('followerUpdatePoll', Ember.run.later(updateData.bind(), this.get('followerUpdateInterval')));
+    };
+
+    if (!this.get('followerUpdatePoll')) {
+      this.updateFollowerData().then(startTimer);
+    } else {
+      startTimer();
+    }
+  },
+
+  updateFollowerData() {
+    let timestamp = moment().format('h:mm:ss a');
+    this.set('lastFollowerUpdate', timestamp);
+
+    return this.getFollowers().then(response => {
+      let follows = response.follows;
+
+      this.set('followerCount', response._total);
+
+      // save point of reference (last follower on session start)
+      if (!this.get('lastKnownFollower')) {
+        this.set('lastKnownFollower', follows[0]);
+      } else {
+        this.addNewFollowers(follows);
+      }
+    });
+  },
+
+  addNewFollowers(follows) {
+    this.set('newFollowerCount', 0);
+
+    let lastKnownFollower = this.get('lastKnownFollower').user.display_name;
+
+    // add every follower until we find the lastKnownFollower
+    follows.some(follow => {
+      let name = follow.user.display_name;
+
+      if (name !== lastKnownFollower) {
+        this.get('latestFollowers').unshiftObject(follow);
+        this.incrementProperty('newFollowerCount');
+      } else {
+        return true;
+      }
+    });
+
+    // update lastKnownFollower
+    this.set('lastKnownFollower', follows[0]);
+  },
+
 /*******************************************************************************
-### PROXY TO TMI.JS METHODS
+### PROXY TO TwitchClient METHODS
 *******************************************************************************/
 
   connect() {

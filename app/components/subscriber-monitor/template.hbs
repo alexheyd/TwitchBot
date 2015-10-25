@@ -1,0 +1,19 @@
+<div class="row subscriber-monitor">
+  <div class="col-xs-12">
+    <h3>Latest Subscribers</h3>
+
+    {{#if latestSubs.length}}
+      <p>You have {{latestSubs.length}} new {{subsCopy}}!</p>
+
+      <ul>
+        {{#each latestSubs as |sub|}}
+          <li>
+            {{sub}}
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No new subscribers yet.</p>
+    {{/if}}
+  </div>
+</div>

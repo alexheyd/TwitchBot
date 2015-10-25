@@ -5,6 +5,8 @@ export default Ember.Component.extend({
 
   twitch: Ember.inject.service(),
 
+  updateViewerListInterval: 60000, // TODO: put in settings
+
   viewerCount: 0,
 
   searchTerm: '',
@@ -27,11 +29,13 @@ export default Ember.Component.extend({
   didInsertElement() {
     setInterval(() => {
       this.updateViewerList();
-    }, 60000);
+    }, this.get('updateViewerListInterval'));
   },
 
   updateViewerList() {
     this.get('twitch').getViewerList().then(response => {
+      console.log('updateViewerList response: ', response);
+      console.log('response.chatters: ', response.chatters);
       this.set('viewerCount', response.chatter_count);
       this.set('viewerList', response.chatters.viewers);
       this.set('viewers', response.chatters.viewers);

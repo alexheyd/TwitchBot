@@ -1,0 +1,23 @@
+<div class="row follower-monitor">
+  <div class="col-xs-12">
+    <h3>Latest Followers <span>(last updated at {{lastFollowerUpdate}})</span></h3>
+
+    {{#if newFollowerCount}}
+      <p>You have {{newFollowerCount}} new {{followerCopy}}!</p>
+
+      <ul>
+        {{#each latestFollowers as |follower|}}
+          <li>
+            {{follower.user.display_name}}
+
+            {{#unless follower.notifications}}
+              <span>(notifications off)</span>
+            {{/unless}}
+          </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <p>No new followers yet.</p>
+    {{/if}}
+  </div>
+</div>

@@ -3,10 +3,8 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   tagName: '',
   twitch: Ember.inject.service(),
-  settings: Ember.inject.service(),
   notifications: Ember.inject.service(),
 
-  users: Ember.computed.alias('settings.users'),
   channel: Ember.computed.alias('twitch.channel'),
 
   actions: {
