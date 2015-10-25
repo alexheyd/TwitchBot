@@ -9,7 +9,7 @@ export default Ember.Component.extend({
   autoScroll: true,
   newMessages: false,
   enableChatInput: false,
-  enableViewerList: false,
+  enableChatterList: false,
   lastReadMarkerSet: false,
   chatInput: '',
 

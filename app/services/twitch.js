@@ -14,7 +14,7 @@ export default Ember.Service.extend({
   botName: Ember.computed.alias('settings.prefs.botName'),
 
   followerUpdateInterval: '60000', // TODO: add to settings
-  followerUpdatePoll: null,
+  // followerUpdatePoll: null,
   lastFollowerUpdate: null,
   newFollowerCount: 0,
 
@@ -76,7 +76,7 @@ export default Ember.Service.extend({
   onAllConnected: function () {
     if (this.get('connected')) {
       // starts a poll
-      this.startFollowerUpdatePoll();
+      this.updateFollowers();
     }
   }.observes('connected').on('init'),
 
@@ -213,21 +213,9 @@ export default Ember.Service.extend({
     this.get('latestFollowers').pushObject(username);
   },
 
-  startFollowerUpdatePoll() {
-    let updateData = () => {
-      this.updateFollowerData().then(this.startFollowerUpdatePoll.bind(this));
-    };
-
-    let startTimer = () => {
-      console.log('>>> Start Follower Update Poll Timer');
-      this.set('followerUpdatePoll', Ember.run.later(updateData.bind(), this.get('followerUpdateInterval')));
-    };
-
-    if (!this.get('followerUpdatePoll')) {
-      this.updateFollowerData().then(startTimer);
-    } else {
-      startTimer();
-    }
+  updateFollowers() {
+    this.updateFollowerData();
+    Ember.run.later(this, this.updateFollowers, this.get('followerUpdateInterval'));
   },
 
   updateFollowerData() {
