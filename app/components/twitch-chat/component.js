@@ -6,6 +6,8 @@ export default Ember.Component.extend({
   twitch: Ember.inject.service(),
   commander: Ember.inject.service(),
 
+  channel: Ember.computed.alias('twitch.channel'),
+
   autoScroll: true,
   newMessages: false,
   enableChatInput: false,
