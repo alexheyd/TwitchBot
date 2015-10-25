@@ -121,6 +121,10 @@ export default Ember.Object.extend({
     return this.get('client').say(channel, message);
   },
 
+  action(channel, message) {
+    return this.get('client').action(channel, message);
+  },
+
   on(event, handler) {
     if (!event || typeof event !== 'string' || !handler || typeof handler !== 'function') {
       return;

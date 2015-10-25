@@ -293,6 +293,18 @@ export default Ember.Service.extend({
     return this.get('streamer').say(this.get('channel'), message);
   },
 
+  botSay(message) {
+    return this.get('bot').say(this.get('channel'), message);
+  },
+
+  action(message) {
+    return this.get('streamer').action(this.get('channel'), message);
+  },
+
+  botAction(message) {
+    return this.get('bot').action(this.get('channel'), message);
+  },
+
   on(event, handler) {
     if (!event || typeof event !== 'string' || !handler || typeof handler !== 'function') {
       return;

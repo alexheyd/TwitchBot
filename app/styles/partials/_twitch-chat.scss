@@ -2,10 +2,6 @@
   position: relative;
   width: 100%;
 
-  .action {
-    font-style: italic;
-  }
-
   .fa-star, .fa-star-o:hover,
   .fa-sticky-note, .fa-sticky-note-o:hover {
     color: #ffcc00;
@@ -65,6 +61,12 @@
 
       i {
         margin-left: 6px;
+      }
+
+      &.action {
+        .msg {
+          font-style: italic;
+        }
       }
 
       // alternate message row colors

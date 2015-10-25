@@ -48,12 +48,11 @@ export default Ember.Service.extend({
   },
 
   botSay(msg) {
-    // this.get('twitch').botSay(msg);
-    this.get('bot').say(this.get('twitch.channel'), msg);
+    this.get('twitch').botSay(msg);
   },
 
   botAction(msg) {
-    this.get('bot').action(this.get('twitch.channel'), msg);
+    this.get('twitch').botAction(msg);
   },
 
   processCommand(message, user) {
