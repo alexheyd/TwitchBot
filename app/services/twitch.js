@@ -45,8 +45,7 @@ export default Ember.Service.extend({
   createClient(user) {
     let username = user.username;
     let channel = this.get('channel');
-
-    this.set(`clients.${username}`, TwitchClient.create({
+    let clientConfig = {
       channel: channel,
       config: {
         identity: {
@@ -55,7 +54,9 @@ export default Ember.Service.extend({
 
         channels: [channel],
       }
-    }));
+    };
+
+    this.set(`clients.${username}`, TwitchClient.create(clientConfig));
 
     // add observers for connecting and connected status
     Ember.addObserver(this, `clients.${username}.connected`, this.onClientConnectionChange.bind(this));
