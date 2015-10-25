@@ -1,0 +1,25 @@
+.connection-status {
+  i {
+    cursor: default;
+    font-size: 20px;
+
+    &.fa-frown-o {
+      color: red;
+    }
+
+    &.fa-meh-o {
+      color: orange;
+    }
+
+    &.fa-smile-o {
+      color: green;
+    }
+  }
+
+  .client-connection-status {
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 6px;
+    margin-right: 6px;
+  }
+}

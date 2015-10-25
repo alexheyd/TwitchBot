@@ -1,5 +1,5 @@
-@import "mixins/reset";
-@include reset;
+// @import "mixins/reset";
+// @include reset;
 
 $header-height: 42px;
 
@@ -29,4 +29,5 @@ i {
 "partials/notifications",
 "partials/emoji-selector",
 "partials/user-manager",
+"partials/connection-status",
 "partials/twitch-chat";

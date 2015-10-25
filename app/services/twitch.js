@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import TwitchClient from 'twitch-bot/scripts/twitch-client';
 
 export default Ember.Service.extend({
   settings: Ember.inject.service(),
@@ -13,9 +14,9 @@ export default Ember.Service.extend({
   botName: Ember.computed.alias('settings.prefs.botName'),
 
   clients: {},
+  clientCount: 0,
   clientConfig: {},
   connected: false,
-  connecting: false,
   chatroom: [],
   mentions: [],
   starred: [],
@@ -71,8 +72,36 @@ export default Ember.Service.extend({
     let clientConfig = this.get('clientConfig');
 
     for (let key in clientConfig) {
-      this.set('clients.' + key, new irc.client(clientConfig[key]));
+      // create TwitchClient proxy to irc.client()
+      this.set(`clients.${key}`, TwitchClient.create({
+        config: clientConfig[key], channel: this.get('channel')
+      }));
+
+      // add observers for connecting and connected status
+      Ember.addObserver(this, `clients.${key}.connected`, this.onClientConnectionChange.bind(this));
+      Ember.addObserver(this, `clients.${key}.connecting`, this.onClientConnectionChange.bind(this));
+
+      this.incrementProperty('clientCount');
     }
+  },
+
+  onClientConnectionChange() {
+    let allConnected = true;
+    let stillConnecting = false;
+    let clients = this.get('clients');
+
+    for (let key in clients) {
+      if (!clients[key].connected) {
+        allConnected = false;
+      }
+
+      if (!clients[key].connecting) {
+        stillConnecting = true;
+      }
+    }
+
+    this.set('connected', allConnected);
+    this.set('connecting', stillConnecting);
   },
 
   bindTwitchEvents() {
@@ -80,16 +109,23 @@ export default Ember.Service.extend({
 
     streamerClient.on('chat', this.onChatReceived.bind(this));
     streamerClient.on('action', this.onChatReceived.bind(this));
+    // streamerClient.on('subscription', this.onNewSubcriber.bind(this));
+    // streamerClient.on('join', this.onChannelJoin.bind(this));
+    // streamerClient.on('mods', this.onModListReceived.bind(this));
+    // streamerClient.on('notice', this.onTwitchNoticeReceived.bind(this));
+    //
+    // streamerClient.on('connecting', this.onConnecting.bind(this));
+    // streamerClient.on('disconnected', this.onDisconnected.bind(this));
   },
 
-  onConnecting() {
-    this.set('connecting', true);
-  },
-
-  onConnected() {
-    this.set('connecting', false);
-    this.set('connected', true);
-  },
+  // onConnecting() {
+  //   this.set('connecting', true);
+  // },
+  //
+  // onConnected() {
+  //   this.set('connecting', false);
+  //   this.set('connected', true);
+  // },
 
   onChatReceived(channel, user, message/*, self*/) {
     if (!message) {
@@ -185,40 +221,25 @@ export default Ember.Service.extend({
 
   connect() {
     return new Ember.RSVP.Promise(resolve => {
-      // if currently connecting or already connected, resolve promise
-      if (this.get('connecting') || this.get('connected')) {
+      // if already connected, resolve promise
+      if (this.get('connected')) {
         resolve();
       } else {
+        // connect all clients
         let clients = this.get('clients');
-        let awaitingConnections = 0;
-
-        let _onClientConnection = () => {
-          awaitingConnections--;
-
-          if (!awaitingConnections) {
-            this.onConnected();
-            resolve();
-          }
-        };
-
-        this.set('connecting', true);
+        let allConnections = [];
 
         for (let key in clients) {
-          let client = clients[key];
-
-          client.connect();
-          awaitingConnections++;
-
-          client.on('connected', _onClientConnection);
+          allConnections.push(clients[key].connect());
         }
+
+        Ember.RSVP.all(allConnections).then(resolve);
       }
     });
   },
 
   say(message) {
-    if (this.get('connected')) {
-      this.get('streamer').say(this.get('channel'), message);
-    }
+    return this.get('streamer').say(message);
   },
 
   on(event, handler) {
@@ -226,29 +247,23 @@ export default Ember.Service.extend({
       return;
     }
 
-    this.get('streamer').on(event, handler);
+    return this.get('streamer').on(event, handler);
   },
 
   ban(username) {
-    this.get('streamer').ban(this.get('channel'), username);
+    return this.get('streamer').ban(username);
   },
 
   unban(username) {
-    this.get('streamer').unban(this.get('channel'), username);
+    return this.get('streamer').unban(username);
   },
 
   timeout(username, duration) {
     duration = duration || this.get('viewerTimeoutDuration');
-    this.get('streamer').timeout(this.get('channel'), username, duration);
+    return this.get('streamer').timeout(username, duration);
   },
 
   api(url) {
-    return new Ember.RSVP.Promise(resolve => {
-      this.get('streamer').api({
-        url: url
-      }, (err, res, body) => {
-        resolve(body);
-      });
-    });
+    return this.get('streamer').api(url);
   }
 });
