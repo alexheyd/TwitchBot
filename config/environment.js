@@ -1,5 +1,4 @@
 /* jshint node: true */
-
 module.exports = function(environment) {
   var ENV = {
     modulePrefix: 'twitch-bot',
@@ -24,8 +23,7 @@ module.exports = function(environment) {
     },
 
     APP: {
-      // Here you can pass flags/options to your application instance
-      // when it is created
+      mockMessages: false
     }
   };
 

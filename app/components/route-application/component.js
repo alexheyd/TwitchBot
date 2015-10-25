@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import ENV from 'twitch-bot/config/environment';
 
 export default Ember.Component.extend({
   notifications: Ember.inject.service(),
@@ -14,7 +15,9 @@ export default Ember.Component.extend({
   //************************************************************************
   // TODO: REMOVE DEV CODE
   didInsertElement() {
-    this.get('twitch').on('join', this.onChannelJoin.bind(this));
+    if (ENV.APP.mockMessages) {
+      this.get('twitch').on('join', this.onChannelJoin.bind(this));
+    }
   },
 
   onChannelJoin() {
@@ -49,7 +52,9 @@ export default Ember.Component.extend({
     } else {
       //************************************************************************
       // TODO: REMOVE DEV CODE
-      this.get('twitch').say('dvrsPUP');
+      if (ENV.APP.mockMessages) {
+        this.get('twitch').say('dvrsPUP');
+      }
       // END DEV CODE
       //************************************************************************
 
