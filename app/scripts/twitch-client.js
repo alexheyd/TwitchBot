@@ -2,6 +2,8 @@ import Ember from 'ember';
 
 // proxy to irc.client object with some properties for status tracking
 export default Ember.Object.extend({
+  twitch: Ember.inject.service(),
+
   defaults: {
     options: {
       debug: true
@@ -68,9 +70,6 @@ export default Ember.Object.extend({
     if (!config) {
       console.error('TwitchClient requires a config object.');
     } else {
-      let channel = this.get('channel') || `#${config.identity.username}`;
-
-      this.set('channel', channel);
       this.setupClient(config);
     }
   },
@@ -117,8 +116,9 @@ export default Ember.Object.extend({
     return this.get('client').disconnect();
   },
 
-  say(message) {
-    return this.get('client').say(this.get('channel'), message);
+  say(channel, message) {
+    console.log(`${this.get('clientName')} SAY: ${message} on ${channel}`);
+    return this.get('client').say(channel, message);
   },
 
   on(event, handler) {
@@ -129,17 +129,27 @@ export default Ember.Object.extend({
     return this.get('client').on(event, handler);
   },
 
-  ban(username) {
-    return this.get('client').ban(this.get('channel'), username);
+  ban(channel, username) {
+    return this.get('client').ban(channel, username);
   },
 
-  unban(username) {
-    return this.get('client').unban(this.get('channel'), username);
+  unban(channel, username) {
+    return this.get('client').unban(channel, username);
   },
 
-  timeout(username, duration) {
+  timeout(channel, username, duration) {
     duration = duration || this.get('viewerTimeoutDuration');
-    return this.get('client').timeout(this.get('channel'), username, duration);
+    return this.get('client').timeout(channel, username, duration);
+  },
+
+  join(channel) {
+    console.log(`${this.get('clientName')} JOIN CHANNEL: ${channel}`);
+    return this.get('client').join(channel);
+  },
+
+  part(channel) {
+    console.log(`${this.get('clientName')} PART CHANNEL: ${channel}`);
+    return this.get('client').part(channel);
   },
 
   api(url) {

@@ -56,7 +56,7 @@ export default Ember.Service.extend({
     let username = user.username;
     let channel = this.get('channel');
     let clientConfig = {
-      channel: channel,
+      // channel: channel,
       config: {
         identity: {
           username: username, password: user.oauth
@@ -119,7 +119,7 @@ export default Ember.Service.extend({
       return;
     }
 
-    console.log('chat received from user: ', user);
+    console.log(`chat received on ${channel} from ${user.username}: ${message}`);
     /*
       ## USER OBJECT ##
       color: null
@@ -281,7 +281,7 @@ export default Ember.Service.extend({
   },
 
   say(message) {
-    return this.get('streamer').say(message);
+    return this.get('streamer').say(this.get('channel'), message);
   },
 
   on(event, handler) {
@@ -293,16 +293,35 @@ export default Ember.Service.extend({
   },
 
   ban(username) {
-    return this.get('streamer').ban(username);
+    return this.get('streamer').ban(this.get('channel'), username);
   },
 
   unban(username) {
-    return this.get('streamer').unban(username);
+    return this.get('streamer').unban(this.get('channel'), username);
   },
 
   timeout(username, duration) {
     duration = duration || this.get('viewerTimeoutDuration');
-    return this.get('streamer').timeout(username, duration);
+    return this.get('streamer').timeout(this.get('channel'), username, duration);
+  },
+
+  join(channel) {
+    this.part(this.get('channel'));
+    this.set('channel', channel);
+
+    let clients = this.get('clients');
+
+    for (let clientName in clients) {
+      clients[clientName].join(channel);
+    }
+  },
+
+  part(channel) {
+    let clients = this.get('clients');
+
+    for (let clientName in clients) {
+      clients[clientName].part(channel);
+    }
   },
 
   api(url) {
