@@ -1,0 +1,11 @@
+<h4>To: {{recipient}}</h4>
+
+<div class="thread-content">
+  {{#each thread as |whisper|}}
+    {{whisper-message recipient=recipient whisper=whisper}}
+  {{/each}}
+</div>
+
+<div class="thread-reply">
+  {{input type="text" value=threadReply enter="reply" placeholder="Psst..."}}
+</div>

@@ -1,0 +1,65 @@
+.whispers-tray {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 30px;
+  background: #eee;
+  text-align: right;
+  padding: 0 6px;
+
+  .whisper-thread {
+    position: relative;
+    display: inline-block;
+    top: -36vh;
+    width: 250px;
+    background: #ccc;
+    border: 1px solid #333;
+    border-radius: 6px 6px 0 0;
+
+    input {
+      width: 100%;
+    }
+
+    h4 {
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      margin-top: 0;
+    }
+
+    .thread-content {
+      padding: 10px;
+      overflow: auto;
+      height: 30vh;
+    }
+
+    .whisper-message {
+      margin-bottom: 6px;
+      border-radius: 6px;
+      padding: 6px;
+      border: 1px solid #666;
+      background: #aaa;
+
+      &.outgoing {
+        background: #ccc;
+      }
+
+      .whisper-from {
+        font-weight: bold;
+      }
+
+      .outgoing-whisper {
+        .whisper-from, .whisper-content {
+          text-align: right;
+        }
+      }
+
+      .incoming-whisper {
+        .whisper-from, .whisper-content {
+          text-align: left;
+        }
+      }
+    }
+  }
+}

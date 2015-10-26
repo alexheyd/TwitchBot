@@ -45,6 +45,8 @@ export default Ember.Component.extend({
           commander.processMacro(chatInput);
         } else if (commander.isCustomCommand(chatInput)) {
           commander.processCommand(chatInput);
+        } else if (commander.isWhisper(chatInput)) {
+          commander.processWhisper(chatInput);
         } else {
           this.get('twitch').say(chatInput);
         }

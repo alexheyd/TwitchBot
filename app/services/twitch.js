@@ -31,6 +31,8 @@ export default Ember.Service.extend({
   lastKnownFollower: '',
   followerCount: 0,
 
+  whisperThreads: {},
+
   streamer: Ember.computed('streamerName', function () {
     return this.get('clients.' + this.get('streamerName'));
   }),
@@ -41,6 +43,7 @@ export default Ember.Service.extend({
 
   init() {
     this.createClients();
+    this.createGroupClient();
     this.bindTwitchEvents();
   },
 
@@ -73,6 +76,44 @@ export default Ember.Service.extend({
     Ember.addObserver(this, `clients.${username}.connecting`, this.onClientConnectionChange.bind(this));
   },
 
+  // TODO: refactor groupClient creation and management
+  // TODO: maybe allow groupClient to switch users?
+  createGroupClient() {
+    let streamerName = this.get('streamerName');
+    let oauth = this.get('settings.prefs.users').findBy('username', streamerName).oauth;
+
+    let groupClient = new irc.client({
+      options: {
+        debug: true
+      },
+
+      connection: {
+        random: 'group',
+        reconnect: true
+      },
+
+      identity: {
+        username: streamerName,
+        password: oauth
+      },
+
+      channels: ['#ghostcryptology'] // set during init
+    });
+
+    groupClient.on('whisper', (username, message) => {
+      console.log(`GROUP CLIENT WHISPER from ${username}: ${message}`);
+      this.saveWhisper(username, message);
+    });
+
+    groupClient.connect();
+
+    groupClient.on('connected', () => {
+      console.log('### GROUP CLIENT CONNECTED');
+    });
+
+    this.set('groupClient', groupClient);
+  },
+
   onAllConnected: Ember.observer('connected', function () {
     if (this.get('connected')) {
       // starts a poll
@@ -103,6 +144,7 @@ export default Ember.Service.extend({
     let streamerClient = this.get('streamer');
 
     streamerClient.on('chat', this.onChatReceived.bind(this));
+    streamerClient.on('whisper', this.onWhisperReceived.bind(this));
     streamerClient.on('action', this.onChatReceived.bind(this));
     streamerClient.on('subscription', this.onNewSubcriber.bind(this));
     // streamerClient.on('join', this.onChannelJoin.bind(this));
@@ -112,6 +154,10 @@ export default Ember.Service.extend({
 
   onNewSubcriber(username) {
     this.get('latestSubs').pushObject(username);
+  },
+
+  onWhisperReceived(username, message) {
+    console.log(`WHISPER from ${username}: ${message}`);
   },
 
   onChatReceived(channel, user, message/*, self*/) {
@@ -265,6 +311,26 @@ export default Ember.Service.extend({
     // update lastKnownFollower
     this.set('lastKnownFollower', follows[0]);
   },
+  // TODO: move into separate service
+  saveWhisper(username, message, sendTo) {
+    console.log('saveWhisper: ', username, message, sendTo);
+
+    let whisper = {
+      username: username,
+      message: message,
+      sendTo: (sendTo === undefined) ? false : sendTo
+    };
+
+    let existingThread = this.get('whisperThreads')[username] || null;
+
+    if (existingThread) {
+      existingThread.pushObject(whisper);
+    } else {
+      this.get('whisperThreads')[username] = [whisper];
+    }
+
+    this.notifyPropertyChange('whisperThreads');
+  },
 
 /*******************************************************************************
 ### PROXY TO TwitchClient METHODS
@@ -347,5 +413,10 @@ export default Ember.Service.extend({
 
   api(url) {
     return this.get('streamer').api(url);
+  },
+
+  whisper(username, message) {
+    this.saveWhisper(username, message, true);
+    this.get('groupClient').whisper(username, message);
   }
 });

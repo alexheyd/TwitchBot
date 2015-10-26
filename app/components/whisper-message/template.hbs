@@ -1,0 +1,13 @@
+{{#if whisper.sendTo}}
+  <!-- outgoing message -->
+  <div class="outgoing-whisper">
+    <div class="whisper-from">{{myName}}</div>
+    <div class="whisper-content">{{whisper.message}}</div>
+  </div>
+{{else}}
+  <!-- incoming message -->
+  <div class="incoming-whisper">
+    <div class="whisper-from">{{recipient}}</div>
+    <div class="whisper-content">{{whisper.message}}</div>
+  </div>
+{{/if}}

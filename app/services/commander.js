@@ -86,6 +86,22 @@ export default Ember.Service.extend({
     return commandRules;
   },
 
+  processWhisper(message) {
+    let messageParts = message.replace('/w ', '').split(' ');
+
+    console.log('messageParts: ', messageParts);
+
+    let username = messageParts.shift();
+
+    console.log('extracted username: ', username);
+
+    let msg = messageParts.join(' ');
+
+    console.log('msg: ', msg);
+
+    this.get('twitch').whisper(username, msg);
+  },
+
   execute(commandName, params, user) {
     let command = this.getRules(commandName);
 
@@ -108,6 +124,10 @@ export default Ember.Service.extend({
 
   isMacro(message) {
     return message.indexOf(this.get('macroTrigger')) === 0;
+  },
+
+  isWhisper(message) {
+    return message.indexOf('/w' === 0);
   },
 
   isCustomCommand(message) {
