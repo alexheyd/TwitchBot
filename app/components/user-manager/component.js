@@ -2,9 +2,8 @@ import Ember from 'ember';
 
 export default Ember.Component.extend({
   classNames: ['user-manager'],
-  settings: Ember.inject.service(),
-
-  users: Ember.computed.alias('settings.prefs.users'),
+  settings  : Ember.inject.service(),
+  users     : Ember.computed.alias('settings.prefs.users'),
 
   actions: {
     editUser(userIndex) {

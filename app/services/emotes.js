@@ -1,12 +1,11 @@
 import Ember from 'ember';
 
 export default Ember.Service.extend({
-  settings: Ember.inject.service(),
-  twitch: Ember.inject.service(),
-
-  fetchingEmotes: false,
-  emotes: null,
-  usableEmotes: null,
+  settings        : Ember.inject.service(),
+  twitch          : Ember.inject.service(),
+  fetchingEmotes  : false,
+  emotes          : null,
+  usableEmotes    : null,
   usableEmoteCount: 0,
 
   init() {
@@ -62,15 +61,11 @@ export default Ember.Service.extend({
   saveUsableEmotes(emotes) {
     let usableEmotes = this.extractEmotes(emotes);
     this.set('usableEmotes', usableEmotes);
-
-    console.log('usable emotes: ', usableEmotes);
   },
 
   saveEmotes(emotes) {
     let allEmotes = this.extractEmotes(emotes);
     this.set('emotes', allEmotes);
-
-    console.log('allEmotes: ', allEmotes);
   },
 
   removeUsableEmojiByCode(code) {

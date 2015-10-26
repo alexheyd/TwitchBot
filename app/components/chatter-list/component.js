@@ -1,29 +1,22 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames: ['viewer-list'],
-
-  twitch: Ember.inject.service(),
+  classNames               : ['viewer-list'],
+  twitch                   : Ember.inject.service(),
+  updateChatterListInterval: 60000, // TODO: put in settings
+  viewerCount              : 0,
+  searchTerm               : '',
+  viewerList               : [],
+  viewers                  : [],
+  updateListTimer          : null,
 
   onChannelChange: Ember.observer('twitch.channel', function () {
     this.updateList();
   }),
 
-  updateChatterListInterval: 60000, // TODO: put in settings
-
-  viewerCount: 0,
-
-  searchTerm: '',
-
-  viewerList: [],
-
-  viewers: [],
-
-  updateListTimer: null,
-
   onSearchTermChanged: Ember.observer('searchTerm', function () {
     let searchTerm = this.get('searchTerm');
-    let viewers = this.get('viewerList');
+    let viewers    = this.get('viewerList');
 
     viewers = viewers.filter(viewer => {
       return (viewer.indexOf(searchTerm) > -1);

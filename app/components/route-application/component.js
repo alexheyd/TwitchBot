@@ -2,15 +2,13 @@ import Ember from 'ember';
 import ENV from 'twitch-bot/config/environment';
 
 export default Ember.Component.extend({
+  classNames   : ['application', 'container-fluid'],
   notifications: Ember.inject.service(),
-  twitch: Ember.inject.service(),
-
-  target: Ember.computed.alias('targetObject'),
-  chatroom: Ember.computed.alias('twitch.chatroom'),
-  mentions: Ember.computed.alias('twitch.mentions'),
-  notification: Ember.computed.alias('notifications.item'),
-
-  classNames: ['application', 'container-fluid'],
+  twitch       : Ember.inject.service(),
+  target       : Ember.computed.alias('targetObject'),
+  chatroom     : Ember.computed.alias('twitch.chatroom'),
+  mentions     : Ember.computed.alias('twitch.mentions'),
+  notification : Ember.computed.alias('notifications.item'),
 
   //************************************************************************
   // TODO: REMOVE DEV CODE

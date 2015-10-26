@@ -2,9 +2,9 @@ import Ember from 'ember';
 
 // TODO: bind document click to close emoji selector if not clicked in component
 export default Ember.Component.extend({
-  twitch: Ember.inject.service(),
-  classNames: ['emoji-selector'],
-  emojis: Ember.computed.alias('twitch.emotes.usableEmotes'),
+  twitch              : Ember.inject.service(),
+  classNames          : ['emoji-selector'],
+  emojis              : Ember.computed.alias('twitch.emotes.usableEmotes'),
   emojiSelectorVisible: false,
 
   iconClass: Ember.computed('emojiSelectorVisible', function () {

@@ -1,12 +1,11 @@
 import Ember from 'ember';
 
 export default Ember.Service.extend({
-  twitch: Ember.inject.service(),
-  settings: Ember.inject.service(),
-
+  twitch        : Ember.inject.service(),
+  settings      : Ember.inject.service(),
   commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
-  macroTrigger: Ember.computed.alias('settings.prefs.macroTrigger'),
-  bot: Ember.computed.alias('twitch.bot'),
+  macroTrigger  : Ember.computed.alias('settings.prefs.macroTrigger'),
+  bot           : Ember.computed.alias('twitch.bot'),
 
   rules: {
     hello: {
@@ -27,13 +26,13 @@ export default Ember.Service.extend({
     poll: {
       permissions: 'me',
       handler() {
-        let args = Array.prototype.slice.call(arguments);
+        let args     = Array.prototype.slice.call(arguments);
         let question = args.shift();
-        let answers = '';
+        let answers  = '';
 
         args.forEach((answer, index) => {
           let count = index + 1;
-          answers = `${answers} #${count}: ${answer} `;
+          answers   = `${answers} #${count}: ${answer} `;
         });
 
         this.botSay('Poll: ' + question + ' ' + answers);
@@ -75,29 +74,21 @@ export default Ember.Service.extend({
     });
 
     // command name is the first message part, the rest are command params
-    let commandName = messageParts.shift();
+    let commandName  = messageParts.shift();
     let commandRules = this.getRules(commandName) || {};
 
     // TODO: implement permissions
     commandRules.allowed = true;
-    commandRules.name = commandName;
-    commandRules.params = messageParts;
+    commandRules.name    = commandName;
+    commandRules.params  = messageParts;
 
     return commandRules;
   },
 
   processWhisper(message) {
     let messageParts = message.replace('/w ', '').split(' ');
-
-    console.log('messageParts: ', messageParts);
-
-    let username = messageParts.shift();
-
-    console.log('extracted username: ', username);
-
-    let msg = messageParts.join(' ');
-
-    console.log('msg: ', msg);
+    let username     = messageParts.shift();
+    let msg          = messageParts.join(' ');
 
     this.get('twitch').whisper(username, msg);
   },

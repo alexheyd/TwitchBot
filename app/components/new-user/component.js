@@ -1,11 +1,10 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  settings: Ember.inject.service(),
-
-  classNames: ['add-user'],
+  settings   : Ember.inject.service(),
+  classNames : ['add-user'],
   newUsername: null,
-  newOauth: null,
+  newOauth   : null,
 
   actions: {
     addUser() {
@@ -15,8 +14,8 @@ export default Ember.Component.extend({
 
   addUser() {
     let newUsername = this.get('newUsername');
-    let newOauth = this.get('newOauth');
-    let settings = this.get('settings');
+    let newOauth    = this.get('newOauth');
+    let settings    = this.get('settings');
 
     if (!newUsername || !newOauth) {
       return;
@@ -30,7 +29,6 @@ export default Ember.Component.extend({
       this.set('newUsername', '');
       this.set('newOauth', '');
       this.$('input.new-username').focus();
-
       this.get('settings').save();
     }
   }

@@ -2,14 +2,11 @@ import Ember from 'ember';
 
 // TODO: implement whisper thread minimize, restore, close, ignore
 export default Ember.Component.extend({
-  classNames: ['whisper-thread'],
+  classNames       : ['whisper-thread'],
   classNameBindings: ['recipient', 'minimized'],
-
-  twitch: Ember.inject.service(),
-
-  threadReply: '',
-
-  minimized: false,
+  twitch           : Ember.inject.service(),
+  threadReply      : '',
+  minimized        : false,
 
   toggleIconClass: Ember.computed('minimized', function () {
     return this.get('minimized') ? 'fa-caret-square-o-up' : 'fa-caret-square-o-down';
@@ -19,7 +16,7 @@ export default Ember.Component.extend({
     if (!this.get('isVisible')) {
       this.set('isVisible', true);
     }
-    
+
     if (this.get('minimized')) {
       this.set('minimized', false);
     }

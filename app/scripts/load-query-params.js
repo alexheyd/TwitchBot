@@ -2,13 +2,13 @@ import Ember from 'ember';
 import ENV from 'twitch-bot/config/environment';
 
 export default function () {
-  let queryParts = window.location.search.replace('?', '').split('&');
+  let queryParts  = window.location.search.replace('?', '').split('&');
   let queryParams = {};
 
   if (queryParts.length) {
     queryParts.forEach((queryPart) => {
-      let query = queryPart.split('=');
-      let prop = query[0];
+      let query = queryPart.split(' =');
+      let prop  = query[0];
       let value = query[1];
 
       // convert boolean string to a real boolean

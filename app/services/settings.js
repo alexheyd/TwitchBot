@@ -4,12 +4,12 @@ export default Ember.Service.extend({
   storage: Ember.inject.service(),
 
   prefs: {
-    users: [],
-    defaultChannel: '',
-    commandTrigger: '/',
-    macroTrigger: '~',
-    streamerName: 'GhostCryptology',
-    botName: 'DevourBot',
+    users                : [],
+    defaultChannel       : '',
+    commandTrigger       : '/',
+    macroTrigger         : '~',
+    streamerName         : 'GhostCryptology',
+    botName              : 'DevourBot',
     viewerTimeoutDuration: 300 // in seconds
   },
 
@@ -42,7 +42,7 @@ export default Ember.Service.extend({
    */
   designateUser(name, type) {
     let users = this.get('users');
-    let user = users.findBy('username', name);
+    let user  = users.findBy('username', name);
 
     users.setEach(type, false);
 

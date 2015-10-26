@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
-  twitch: Ember.inject.service(),
+  twitch  : Ember.inject.service(),
   settings: Ember.inject.service(),
 
   actions: {

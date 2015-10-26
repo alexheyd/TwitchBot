@@ -10,7 +10,7 @@ export default Ember.Object.extend({
     },
 
     connection: {
-      random: 'chat',
+      random   : 'chat',
       reconnect: true
     },
 
@@ -22,15 +22,14 @@ export default Ember.Object.extend({
     channels: [''] // set during init
   },
 
-  client: null,
-  connected: false,
+  client    : null,
+  connected : false,
   connecting: false,
 
   status: Ember.computed('connected', 'connecting', function () {
-    let connected = this.get('connected');
+    let connected  = this.get('connected');
     let connecting = this.get('connecting');
-
-    let status = 'Disconnected';
+    let status     = 'Disconnected';
 
     if (connected) {
       status = 'Connected';
@@ -65,6 +64,7 @@ export default Ember.Object.extend({
 
   init() {
     let config = Ember.$.extend({}, this.get('defaults'), this.get('config'));
+    
     this.set('config', config);
 
     if (!config) {

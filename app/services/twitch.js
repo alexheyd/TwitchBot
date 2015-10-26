@@ -2,36 +2,32 @@ import Ember from 'ember';
 import TwitchClient from 'twitch-bot/scripts/twitch-client';
 
 export default Ember.Service.extend({
-  settings: Ember.inject.service(),
-  commander: Ember.inject.service(),
-  emotes: Ember.inject.service(),
-
-  channel: Ember.computed.alias('settings.prefs.defaultChannel'),
-  viewerTimeoutDuration: Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
-  commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
-  macroTrigger: Ember.computed.alias('settings.prefs.macroTrigger'),
-  streamerName: Ember.computed.alias('settings.prefs.streamerName'),
-  botName: Ember.computed.alias('settings.prefs.botName'),
-
+  settings              : Ember.inject.service(),
+  commander             : Ember.inject.service(),
+  emotes                : Ember.inject.service(),
+  channel               : Ember.computed.alias('settings.prefs.defaultChannel'),
+  viewerTimeoutDuration : Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
+  commandTrigger        : Ember.computed.alias('settings.prefs.commandTrigger'),
+  macroTrigger          : Ember.computed.alias('settings.prefs.macroTrigger'),
+  streamerName          : Ember.computed.alias('settings.prefs.streamerName'),
+  botName               : Ember.computed.alias('settings.prefs.botName'),
   followerUpdateInterval: '60000', // TODO: add to settings
-  updateFollowerTimer: null,
-  lastFollowerUpdate: null,
-  newFollowerCount: 0,
-
-  clients: {},
-  clientCount: 0,
-  clientConfig: {},
-  connected: false,
-  chatroom: [],
-  mentions: [],
-  starred: [],
-  latestSubs: [],
-  lastKnownSub: '',
-  latestFollowers: [],
-  lastKnownFollower: '',
-  followerCount: 0,
-
-  whisperThreads: {},
+  updateFollowerTimer   : null,
+  lastFollowerUpdate    : null,
+  newFollowerCount      : 0,
+  clients               : {},
+  clientCount           : 0,
+  clientConfig          : {},
+  connected             : false,
+  chatroom              : [],
+  mentions              : [],
+  starred               : [],
+  latestSubs            : [],
+  lastKnownSub          : '',
+  latestFollowers       : [],
+  lastKnownFollower     : '',
+  followerCount         : 0,
+  whisperThreads        : {},
 
   streamer: Ember.computed('streamerName', function () {
     return this.get('clients.' + this.get('streamerName'));
@@ -56,16 +52,16 @@ export default Ember.Service.extend({
   },
 
   createClient(user) {
-    let username = user.username;
-    let channel = this.get('channel');
+    let username     = user.username;
+    let channel      = this.get('channel');
     let clientConfig = {
-      // channel: channel,
       config: {
         identity: {
-          username: username, password: user.oauth
+          username: username,
+          password: user.oauth
         },
 
-        channels: [channel],
+        channels: [channel]
       }
     };
 
@@ -80,15 +76,14 @@ export default Ember.Service.extend({
   // TODO: maybe allow groupClient to switch users?
   createGroupClient() {
     let streamerName = this.get('streamerName');
-    let oauth = this.get('settings.prefs.users').findBy('username', streamerName).oauth;
-
-    let groupClient = new irc.client({
+    let oauth        = this.get('settings.prefs.users').findBy('username', streamerName).oauth;
+    let groupClient  = new irc.client({
       options: {
         debug: true
       },
 
       connection: {
-        random: 'group',
+        random   : 'group',
         reconnect: true
       },
 
@@ -97,7 +92,7 @@ export default Ember.Service.extend({
         password: oauth
       },
 
-      channels: ['#ghostcryptology'] // set during init
+      channels: ['#ghostcryptology'] // TODO: make group channel dynamic
     });
 
     groupClient.on('whisper', (username, message) => {
@@ -122,9 +117,9 @@ export default Ember.Service.extend({
   }),
 
   onClientConnectionChange() {
-    let allConnected = true;
+    let allConnected    = true;
     let stillConnecting = false;
-    let clients = this.get('clients');
+    let clients         = this.get('clients');
 
     for (let key in clients) {
       if (!clients[key].connected) {
@@ -198,9 +193,9 @@ export default Ember.Service.extend({
     // TODO: abstract the chat message "model"
     let msg = {
       content: this.escapeHtml(message),
-      user: user,
+      user   : user,
       starred: false,
-      index: this.get('chatroom').length
+      index  : this.get('chatroom').length
     };
 
     this.captureChat(msg);
@@ -234,6 +229,7 @@ export default Ember.Service.extend({
   getChatterList() {
     let channel = this.get('channel').replace('#', '').toLowerCase();
 
+    // TODO: store API urls elsewhere for getChatterList
     return this.api(`http://tmi.twitch.tv/group/user/${channel}/chatters`).then(response => {
       return response.data;
     });
@@ -241,6 +237,8 @@ export default Ember.Service.extend({
 
   getFollowers() {
     let streamerName = this.get('streamerName').toLowerCase();
+
+    // TODO: store API urls elsewhere for getFollowers
     return this.api(`https://api.twitch.tv/kraken/channels/${streamerName}/follows/?limit=100`).then(response => {
       console.log('getFollowers() response: ', response);
       return response;
@@ -249,7 +247,7 @@ export default Ember.Service.extend({
 
   toggleStarMessage(message) {
     let starredMessages = this.get('starred');
-    let starred = starredMessages.findBy('index', message.index);
+    let starred         = starredMessages.findBy('index', message.index);
 
     if (starred) {
       starredMessages.removeObject(starred);
@@ -275,6 +273,7 @@ export default Ember.Service.extend({
 
   updateFollowerData() {
     let timestamp = moment().format('h:mm:ss a');
+
     this.set('lastFollowerUpdate', timestamp);
 
     return this.getFollowers().then(response => {
@@ -317,8 +316,8 @@ export default Ember.Service.extend({
 
     let whisper = {
       username: username,
-      message: message,
-      sendTo: (sendTo === undefined) ? false : sendTo
+      message : message,
+      sendTo  : (sendTo === undefined) ? false : sendTo
     };
 
     let existingThread = this.get('whisperThreads')[username] || null;
@@ -343,7 +342,7 @@ export default Ember.Service.extend({
         resolve();
       } else {
         // connect all clients
-        let clients = this.get('clients');
+        let clients        = this.get('clients');
         let allConnections = [];
 
         for (let key in clients) {

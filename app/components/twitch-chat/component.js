@@ -1,19 +1,16 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames: ['twitch-chat', 'row'],
-
-  twitch: Ember.inject.service(),
-  commander: Ember.inject.service(),
-
-  channel: Ember.computed.alias('twitch.channel'),
-
-  autoScroll: true,
-  newMessages: false,
-  enableChatInput: false,
+  classNames       : ['twitch-chat', 'row'],
+  twitch           : Ember.inject.service(),
+  commander        : Ember.inject.service(),
+  channel          : Ember.computed.alias('twitch.channel'),
+  autoScroll       : true,
+  newMessages      : false,
+  enableChatInput  : false,
   enableChatterList: false,
   lastReadMarkerSet: false,
-  chatInput: '',
+  chatInput        : '',
 
   actions: {
     useEmoji(code) {
@@ -85,8 +82,8 @@ export default Ember.Component.extend({
     let msgs = this.get('messages');
 
     if (msgs.length) {
-      let lastMsg = msgs[msgs.length - 1];
-      let words = lastMsg.content.split(' ');
+      let lastMsg    = msgs[msgs.length - 1];
+      let words      = lastMsg.content.split(' ');
       let newMessage = [];
 
       if (lastMsg.emojisConverted) {
@@ -137,21 +134,22 @@ export default Ember.Component.extend({
 
   isScrolledToBottom() {
     let $chatbox = this.$('.chatbox');
-    let chatbox = $chatbox[0];
+    let chatbox  = $chatbox[0];
 
     return chatbox.scrollTop === (chatbox.scrollHeight - $chatbox.height());
   },
 
   scrollToBottom() {
     let chatbox = this.$('.chatbox')[0];
+
     chatbox.scrollTop = chatbox.scrollHeight;
     this.set('newMessages', false);
   },
 
   scrollToLastReadMarker() {
-    let msgs = this.get('messages');
+    let msgs     = this.get('messages');
     let lastRead = msgs.findBy('lastRead', true);
-    let index = null;
+    let index    = null;
 
     if (lastRead) {
       index = msgs.indexOf(lastRead);
@@ -167,7 +165,7 @@ export default Ember.Component.extend({
 
   scrollTo(index) {
     let message = this.$('.chat-msg').eq(index)[0];
-    let top = message.offsetTop;
+    let top     = message.offsetTop;
 
     this.$('.chatbox')[0].scrollTop = top;
   }
