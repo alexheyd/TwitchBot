@@ -127,7 +127,7 @@ export default Ember.Service.extend({
   },
 
   isWhisper(message) {
-    return message.indexOf('/w' === 0);
+    return message.indexOf('/w') === 0;
   },
 
   isCustomCommand(message) {
