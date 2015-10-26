@@ -3,8 +3,15 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   twitch: Ember.inject.service(),
   classNames: ['chat-msg'],
-  classNameBindings: ['message.lastRead', 'message.user.message-type'],
+  classNameBindings: ['message.lastRead', 'messageType'],
+
   banned: false,
+
+  messageType: Ember.computed.alias('message.user.message-type'),
+
+  messageStyle: Ember.computed('messageType', function () {
+    return this.get('messageType') === 'action' ? `color: ${this.get('message.user.color')}` : '';
+  }),
 
   actions: {
     markAsLast(message) {
