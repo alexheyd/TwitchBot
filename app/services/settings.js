@@ -60,18 +60,24 @@ export default Ember.Service.extend({
       if (this.get('loaded')) {
         resolve();
       } else {
-        let settings = this.get('storage').getItem('settings');
+        this.loadFromStorage().then(resolve, reject);
+      }
+    });
+  },
 
-        if (settings) {
-          this.set('prefs', JSON.parse(settings));
-          this.set('loaded', true);
-          resolve();
-        } else {
-          // save defaults
-          this.save();
-          this.set('loaded', true);
-          reject();
-        }
+  loadFromStorage() {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      let settings = this.get('storage').getItem('settings');
+
+      if (settings) {
+        this.set('prefs', JSON.parse(settings));
+        this.set('loaded', true);
+        resolve();
+      } else {
+        // save defaults
+        this.save();
+        this.set('loaded', true);
+        reject();
       }
     });
   },
