@@ -14,7 +14,7 @@ i {
   color: #333;
 
   &:hover, &.selected {
-    color: #cc0000;
+    color: #cc0000 !important;
   }
 }
 

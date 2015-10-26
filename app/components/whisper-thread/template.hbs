@@ -1,4 +1,9 @@
-<h4>To: {{recipient}}</h4>
+<h4 {{action "toggleThread"}}>To: {{recipient}}</h4>
+
+<div class="thread-actions">
+  <i class="fa {{toggleIconClass}}" {{action "toggleThread"}} />
+  <i class="fa fa-times" {{action "closeThread"}} />
+</div>
 
 <div class="thread-content">
   {{#each thread as |whisper|}}
