@@ -1,5 +1,6 @@
 import Ember from 'ember';
 
+// TODO: implement whisper thread minimize, restore, close, ignore
 export default Ember.Component.extend({
   classNames: ['whisper-thread'],
   classNameBindings: ['recipient'],
@@ -7,10 +8,6 @@ export default Ember.Component.extend({
   twitch: Ember.inject.service(),
 
   threadReply: '',
-  // onThreadUpdate: Ember.observer('thread.[]', function () {
-  //   console.log('thread updated!!!');
-  //   this.scrollToBottom();
-  // }),
 
   didRender() {
     this.scrollToBottom();

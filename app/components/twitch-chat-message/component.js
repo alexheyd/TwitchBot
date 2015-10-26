@@ -25,12 +25,14 @@ export default Ember.Component.extend({
 
     timeoutUser(user) {
       console.log('timeout: ', user.username);
+      // TODO: enable timeout through chat message
       // this.get('twitch').timeout(user.username);
     },
 
     toggleUserBan(user) {
       console.log('ban: ', user.username);
 
+      // TODO: implement confirm dialog
       // this.get('dialog').confirm('Are you sure?', {
       //   labels: {
       //     yes: 'OK', no: 'Cancel'
@@ -41,6 +43,7 @@ export default Ember.Component.extend({
       //   }
       // }).then(this.ban.bind(this), this.cancelBan.bind(this));
 
+      // TODO: enable ban/unban through chat message
       if (this.get('banned')) {
         // this.get('twitch').unban(user.username);
       } else {

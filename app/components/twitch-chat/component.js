@@ -41,6 +41,7 @@ export default Ember.Component.extend({
       let commander = this.get('commander');
 
       if (chatInput) {
+        // TODO: maybe move this chat command logic elsewhere?
         if (commander.isMacro(chatInput)) {
           commander.processMacro(chatInput);
         } else if (commander.isCustomCommand(chatInput)) {
