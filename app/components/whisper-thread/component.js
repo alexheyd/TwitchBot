@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-// TODO: implement whisper thread minimize, restore, close, ignore
+// TODO: implement whisper thread ignore
 export default Ember.Component.extend({
   classNames       : ['whisper-thread'],
   classNameBindings: ['recipient', 'minimized'],
@@ -41,7 +41,6 @@ export default Ember.Component.extend({
     }
   },
 
-  // TODO: fix, only display closed thread if its own thread was updated
   didRender() {
     this.scrollToBottom();
   },

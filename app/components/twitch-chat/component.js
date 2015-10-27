@@ -6,14 +6,12 @@ export default Ember.Component.extend({
   chatlist         : Ember.inject.service(),
   commander        : Ember.inject.service(),
   channel          : Ember.computed.alias('twitch.channel'),
+  completions      : Ember.computed.alias('chatlist.all'),
   autoScroll       : true,
   newMessages      : false,
   enableChatInput  : false,
   enableChatterList: false,
   lastReadMarkerSet: false,
-
-  // TODO: implement real completion list
-  completions: Ember.computed.alias('chatlist.all'),
 
   actions: {
     useEmoji(code) {
@@ -66,7 +64,6 @@ export default Ember.Component.extend({
 
   // updates chat scroll position when new chat messages are received
   didRender() {
-    // TODO: fix auto scroll
     if (this.get('autoScroll')) {
       this.scrollToBottom();
     }
