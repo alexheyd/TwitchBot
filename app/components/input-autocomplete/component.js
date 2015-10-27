@@ -41,12 +41,18 @@ export default Ember.Component.extend({
       this.hideCompletions();
     } else {
       let messageParts = chatInput.split(' ');
+      let triggerFound = false;
 
       messageParts.forEach((messagePart) => {
         if (messagePart && messagePart.indexOf('@') === 0 && this.get('completions').indexOf(messagePart.substr(1)) === -1) {
           this.set('filter', messagePart);
+          triggerFound = true;
         }
       });
+
+      if (!triggerFound) {
+        this.hideCompletions();
+      }
     }
   }),
 
@@ -58,13 +64,18 @@ export default Ember.Component.extend({
       // TODO: implement text replacement via paste to maintain cursor position
       // if user selects autocompletion item
       if (filteredCompletions) {
-        let filter        = this.get('filter').substr(1);
+        let filter        = this.get('filter');
+        let filteredName  = filter.substr(1);
         let completion    = this.$('.completions li').eq(this.get('highlightIndex')).text();
-        let caretPosition = this.getCaretPosition() + (completion.length - filter.length);
+        let caretPosition = this.getCaretPosition() + (completion.length - filteredName.length);
 
         this.saveCaretPosition(caretPosition);
-        this.set('chatInput', chatInput.replace(filter, completion));
-        // this.setCaretPosition(caretPosition);
+
+        if (filteredName) {
+          this.set('chatInput', chatInput.replace(filteredName, completion));
+        } else {
+          this.set('chatInput', chatInput.replace(filter, filter + completion));
+        }
 
         this.hideCompletions();
       } else {
@@ -145,15 +156,16 @@ export default Ember.Component.extend({
     }
   },
 
-  keyUp(event) {
-    let eventCode = event.keyCode;
-    let index     = this.get('highlightIndex');
-    let prevIndex = index - 1;
-    let nextIndex = index + 1;
-    let maxIndex  = this.get('completions').length - 1;
+  keyDown(event) {
+    let eventCode             = event.keyCode;
+    let index                 = this.get('highlightIndex');
+    let prevIndex             = index - 1;
+    let nextIndex             = index + 1;
+    let maxIndex              = this.get('completions').length - 1;
+    let completionListVisible = this.get('completionListVisible');
 
     if (eventCode === 38 || eventCode === 40) {
-      if (this.get('completionListVisible')) {
+      if (completionListVisible) {
         event.preventDefault();
       }
 
@@ -167,7 +179,7 @@ export default Ember.Component.extend({
 
       this.set('highlightIndex', index);
 
-      if (this.get('completionListVisible')) {
+      if (completionListVisible) {
         return false;
       }
     }
