@@ -4,6 +4,28 @@ body {
   overflow: hidden;
 }
 
+.application.connected {
+  #loading {
+    display: none;
+  }
+}
+
+#loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #111;
+  z-index: 100000;
+
+  h1 {
+    color: #f1f1f1;
+    line-height: 100vh;
+    text-align: center;
+  }
+}
+
 #chat {
   // background: #ddd;
   width: 50vw;

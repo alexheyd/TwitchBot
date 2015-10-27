@@ -2,13 +2,15 @@ import Ember from 'ember';
 import ENV from 'twitch-bot/config/environment';
 
 export default Ember.Component.extend({
-  classNames   : ['application', 'container-fluid'],
-  notifications: Ember.inject.service(),
-  twitch       : Ember.inject.service(),
-  target       : Ember.computed.alias('targetObject'),
-  chatroom     : Ember.computed.alias('twitch.chatroom'),
-  mentions     : Ember.computed.alias('twitch.mentions'),
-  notification : Ember.computed.alias('notifications.item'),
+  classNames       : ['application', 'container-fluid'],
+  classNameBindings: ['connected'],
+  notifications    : Ember.inject.service(),
+  twitch           : Ember.inject.service(),
+  // target           : Ember.computed.alias('targetObject'),
+  chatroom         : Ember.computed.alias('twitch.chatroom'),
+  mentions         : Ember.computed.alias('twitch.mentions'),
+  notification     : Ember.computed.alias('notifications.item'),
+  connected        : Ember.computed.alias('twitch.connected'),
 
   //************************************************************************
   // TODO: REMOVE DEV CODE
@@ -32,15 +34,15 @@ export default Ember.Component.extend({
   // END DEV CODE
   //************************************************************************
 
-  onTwitchConnection: Ember.observer('twitch.connecting', function () {
-    let connecting = this.get('twitch.connecting');
-
-    if (connecting) {
-      this.get('notifications').info('Connecting to Twitch... Please wait...');
-    } else {
-      this.get('notifications').remove();
-    }
-  }),
+  // onTwitchConnection: Ember.observer('twitch.connecting', function () {
+  //   let connecting = this.get('twitch.connecting');
+  //
+  //   if (connecting) {
+  //     this.get('notifications').info('Connecting to Twitch... Please wait...');
+  //   } else {
+  //     this.get('notifications').remove();
+  //   }
+  // }),
 
   onFetchingEmotes: Ember.observer('twitch.emotes.fetchingEmotes', function () {
     let fetchingEmotes = this.get('twitch.emotes.fetchingEmotes');
