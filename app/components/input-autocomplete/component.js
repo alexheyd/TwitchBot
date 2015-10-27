@@ -1,5 +1,13 @@
 import Ember from 'ember';
 
+// ChatterAutoComplete = {
+//   completions: {
+//     '@': [],
+//     '/w': []
+//   }
+// }
+
+// TODO: refactor completions as mixin to support both chatter and whispers with different triggers
 export default Ember.Component.extend({
   classNames           : ['input-autocomplete'],
   twitch               : Ember.inject.service(),
@@ -158,8 +166,11 @@ export default Ember.Component.extend({
     let eventCode             = event.keyCode;
     let completionListVisible = this.get('completionListVisible');
 
+    console.log('eventCode: ', eventCode);
+
     // TODO: move inputMap elsewhere -- refactor into key input service?
     let inputMap = {
+      9 : 'Tab',
       13: 'Enter',
       38: 'Up',
       40: 'Down'
@@ -183,10 +194,19 @@ export default Ember.Component.extend({
     let filteredCompletions = this.get('filteredCompletions');
 
     // if user selects autocompletion item
-    if (filteredCompletions) {
+    if (filteredCompletions && chatInput) {
       this.autocomplete();
     } else if (chatInput) {
       this.sendChat(chatInput);
+    }
+  },
+
+  onTabPressed() {
+    let chatInput           = this.get('chatInput');
+    let filteredCompletions = this.get('filteredCompletions');
+
+    if (filteredCompletions && chatInput) {
+      this.autocomplete();
     }
   },
 

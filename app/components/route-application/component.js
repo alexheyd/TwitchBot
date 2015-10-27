@@ -6,7 +6,6 @@ export default Ember.Component.extend({
   classNameBindings: ['connected'],
   notifications    : Ember.inject.service(),
   twitch           : Ember.inject.service(),
-  // target           : Ember.computed.alias('targetObject'),
   chatroom         : Ember.computed.alias('twitch.chatroom'),
   mentions         : Ember.computed.alias('twitch.mentions'),
   notification     : Ember.computed.alias('notifications.item'),
