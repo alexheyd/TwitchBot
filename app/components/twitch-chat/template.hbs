@@ -25,10 +25,7 @@
       {{/if}}
 
       {{#if enableChatInput}}
-        <div class="msg-input">
-          {{input type="text" value=chatInput enter="say" placeholder="Say something..."}}
-          {{emoji-selector useEmoji="useEmoji"}}
-        </div>
+        {{input-autocomplete completions=completions placeholder="Say something..." say="say"}}
       {{/if}}
     </div>
 

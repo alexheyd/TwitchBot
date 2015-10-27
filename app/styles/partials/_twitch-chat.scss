@@ -11,18 +11,12 @@
     color: #be6b0a;
   }
 
-  .msg-input {
+  .input-autocomplete {
     position: relative;
     margin-top: 6px;
 
     input {
       width: 99%;
-    }
-
-    .emoji-selector {
-      position: absolute;
-      top: 7px;
-      right: 10px;
     }
   }
 

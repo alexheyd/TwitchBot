@@ -3,6 +3,7 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   classNames       : ['twitch-chat', 'row'],
   twitch           : Ember.inject.service(),
+  chatlist         : Ember.inject.service(),
   commander        : Ember.inject.service(),
   channel          : Ember.computed.alias('twitch.channel'),
   autoScroll       : true,
@@ -10,7 +11,9 @@ export default Ember.Component.extend({
   enableChatInput  : false,
   enableChatterList: false,
   lastReadMarkerSet: false,
-  chatInput        : '',
+
+  // TODO: implement real completion list
+  completions: Ember.computed.alias('chatlist.all'),
 
   actions: {
     useEmoji(code) {
@@ -33,8 +36,7 @@ export default Ember.Component.extend({
       this.scrollToBottom();
     },
 
-    say() {
-      let chatInput = this.get('chatInput');
+    say(chatInput) {
       let commander = this.get('commander');
 
       if (chatInput) {
@@ -48,8 +50,6 @@ export default Ember.Component.extend({
         } else {
           this.get('twitch').say(chatInput);
         }
-
-        this.set('chatInput', '');
       }
     }
   },

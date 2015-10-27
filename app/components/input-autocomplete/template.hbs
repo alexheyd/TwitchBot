@@ -1,0 +1,8 @@
+{{input type="text" value=chatInput placeholder=placeholder enter="say"}}
+{{emoji-selector useEmoji="useEmoji"}}
+
+<ul class="completions">
+  {{#each filteredCompletions as |completion|}}
+    <li {{action "autocomplete" completion}}>{{completion}}</li>
+  {{/each}}
+</ul>

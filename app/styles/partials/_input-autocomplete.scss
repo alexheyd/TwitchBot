@@ -1,0 +1,30 @@
+.input-autocomplete {
+  input {
+    width: 100%;
+  }
+
+  .emoji-selector {
+    position: absolute;
+    top: 7px;
+    right: 10px;
+  }
+
+  .completions {
+    display: none;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+
+    li {
+      list-style: none;
+
+      &.highlighted {
+        background: #ccc;
+      }
+    }
+
+    &.active {
+      display: block;
+    }
+  }
+}

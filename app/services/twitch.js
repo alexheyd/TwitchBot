@@ -2,6 +2,7 @@ import Ember from 'ember';
 import TwitchClient from 'twitch-bot/scripts/twitch-client';
 
 export default Ember.Service.extend({
+  chatlist              : Ember.inject.service(),
   settings              : Ember.inject.service(),
   commander             : Ember.inject.service(),
   emotes                : Ember.inject.service(),
@@ -35,6 +36,14 @@ export default Ember.Service.extend({
 
   bot: Ember.computed('botName', function () {
     return this.get('clients.' + this.get('botName'));
+  }),
+
+  onAllConnected: Ember.observer('connected', function () {
+    if (this.get('connected')) {
+      // starts a poll
+      this.updateFollowers();
+      this.updateChatterList();
+    }
   }),
 
   init() {
@@ -108,13 +117,6 @@ export default Ember.Service.extend({
 
     this.set('groupClient', groupClient);
   },
-
-  onAllConnected: Ember.observer('connected', function () {
-    if (this.get('connected')) {
-      // starts a poll
-      this.updateFollowers();
-    }
-  }),
 
   onClientConnectionChange() {
     let allConnected    = true;
@@ -226,15 +228,6 @@ export default Ember.Service.extend({
     return 'http://www.twitch.tv/' + username;
   },
 
-  getChatterList() {
-    let channel = this.get('channel').replace('#', '').toLowerCase();
-
-    // TODO: store API urls elsewhere for getChatterList
-    return this.api(`http://tmi.twitch.tv/group/user/${channel}/chatters`).then(response => {
-      return response.data;
-    });
-  },
-
   getFollowers() {
     let streamerName = this.get('streamerName').toLowerCase();
 
@@ -258,6 +251,10 @@ export default Ember.Service.extend({
 
   addLatestFollower(username) {
     this.get('latestFollowers').pushObject(username);
+  },
+
+  updateChatterList() {
+    this.get('chatlist').update();
   },
 
   updateFollowers() {
