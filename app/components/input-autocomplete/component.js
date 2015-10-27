@@ -166,12 +166,13 @@ export default Ember.Component.extend({
     let eventCode             = event.keyCode;
     let completionListVisible = this.get('completionListVisible');
 
-    console.log('eventCode: ', eventCode);
+    // console.log('eventCode: ', eventCode);
 
     // TODO: move inputMap elsewhere -- refactor into key input service?
     let inputMap = {
       9 : 'Tab',
       13: 'Enter',
+      27: 'Escape',
       38: 'Up',
       40: 'Down'
     };
@@ -187,6 +188,10 @@ export default Ember.Component.extend({
         return false;
       }
     }
+  },
+
+  onEscapePressed() {
+    this.hideCompletions();
   },
 
   onEnterPressed() {
