@@ -44,7 +44,7 @@ export default Ember.Component.extend({
       let triggerFound = false;
 
       messageParts.forEach((messagePart) => {
-        if (messagePart && messagePart.indexOf('@') === 0 && this.get('completions').indexOf(messagePart.substr(1)) === -1) {
+        if (messagePart && messagePart.indexOf('@') === 0 && !this.matchesAnyCompletion(messagePart)) {
           this.set('filter', messagePart);
           triggerFound = true;
         }
@@ -56,37 +56,6 @@ export default Ember.Component.extend({
     }
   }),
 
-  actions: {
-    say() {
-      let chatInput           = this.get('chatInput');
-      let filteredCompletions = this.get('filteredCompletions');
-
-      // TODO: implement text replacement via paste to maintain cursor position
-      // if user selects autocompletion item
-      if (filteredCompletions) {
-        let filter        = this.get('filter');
-        let filteredName  = filter.substr(1);
-        let completion    = this.$('.completions li').eq(this.get('highlightIndex')).text();
-        let caretPosition = this.getCaretPosition() + (completion.length - filteredName.length);
-
-        this.saveCaretPosition(caretPosition);
-
-        if (filteredName) {
-          this.set('chatInput', chatInput.replace(filteredName, completion));
-        } else {
-          this.set('chatInput', chatInput.replace(filter, filter + completion));
-        }
-
-        this.hideCompletions();
-      } else {
-        if (chatInput) {
-          this.sendAction('say', chatInput);
-          this.set('chatInput', '');
-        }
-      }
-    }
-  },
-
   init() {
     this.set('filteredCompletions', this.get('completions'));
     this._super();
@@ -95,11 +64,6 @@ export default Ember.Component.extend({
   didInsertElement() {
     this.set('$completionList', this.$('ul.completions'));
     this.set('$input', this.$('input'));
-  },
-
-  setHighlightIndex(index) {
-    this.set('highlightIndex', index);
-    this.notifyPropertyChange('highlightIndex');
   },
 
   didRender() {
@@ -114,6 +78,36 @@ export default Ember.Component.extend({
     } else {
       this.hideCompletions();
     }
+  },
+
+  setHighlightIndex(index) {
+    this.set('highlightIndex', index);
+    this.notifyPropertyChange('highlightIndex');
+  },
+
+  matchesAnyCompletion(str) {
+    return this.get('completions').indexOf(str.substr(1)) > -1;
+  },
+
+  sendChat(message) {
+    this.sendAction('say', message);
+    this.set('chatInput', '');
+  },
+
+  autocomplete() {
+    let chatInput     = this.get('chatInput');
+    let filter        = this.get('filter');
+    let completion    = '@' + this.getHighlightedItem().text();
+    let caretPosition = this.getCaretPosition() + (completion.length - filter.length);
+    let messageParts  = chatInput.split(' ');
+
+    messageParts = messageParts.map((messagePart) => {
+      return (messagePart === filter) ? completion : messagePart;
+    });
+
+    this.saveCaretPosition(caretPosition);
+    this.set('chatInput', messageParts.join(' '));
+    this.hideCompletions();
   },
 
   showCompletions() {
@@ -156,32 +150,60 @@ export default Ember.Component.extend({
     }
   },
 
+  getHighlightedItem() {
+    return this.get('$completionList').children('li').eq(this.get('highlightIndex'));
+  },
+
   keyDown(event) {
     let eventCode             = event.keyCode;
-    let index                 = this.get('highlightIndex');
-    let prevIndex             = index - 1;
-    let nextIndex             = index + 1;
-    let maxIndex              = this.get('completions').length - 1;
     let completionListVisible = this.get('completionListVisible');
 
-    if (eventCode === 38 || eventCode === 40) {
+    // TODO: move inputMap elsewhere -- refactor into key input service?
+    let inputMap = {
+      13: 'Enter',
+      38: 'Up',
+      40: 'Down'
+    };
+
+    let key     = inputMap[eventCode];
+    let handler = this[`on${key}Pressed`];
+
+    if (handler) {
+      handler.bind(this)();
+
       if (completionListVisible) {
         event.preventDefault();
-      }
-
-      // up arrow
-      if (eventCode === 38) {
-        index = (prevIndex >= 0) ? prevIndex : 0;
-      // down arrow
-      } else if (eventCode === 40) {
-        index = (nextIndex <= maxIndex) ? nextIndex : maxIndex;
-      }
-
-      this.set('highlightIndex', index);
-
-      if (completionListVisible) {
         return false;
       }
     }
+  },
+
+  onEnterPressed() {
+    let chatInput           = this.get('chatInput');
+    let filteredCompletions = this.get('filteredCompletions');
+
+    // if user selects autocompletion item
+    if (filteredCompletions) {
+      this.autocomplete();
+    } else if (chatInput) {
+      this.sendChat(chatInput);
+    }
+  },
+
+  onUpPressed() {
+    let index     = this.get('highlightIndex');
+    let prevIndex = index - 1;
+    index         = (prevIndex >= 0) ? prevIndex : 0;
+
+    this.set('highlightIndex', index);
+  },
+
+  onDownPressed() {
+    let index     = this.get('highlightIndex');
+    let nextIndex = index + 1;
+    let maxIndex  = this.get('completions').length - 1;
+    index         = (nextIndex <= maxIndex) ? nextIndex : maxIndex;
+
+    this.set('highlightIndex', index);
   }
 });
