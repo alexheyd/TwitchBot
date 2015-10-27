@@ -1,54 +1,71 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames         : ['input-autocomplete'],
-  twitch             : Ember.inject.service(),
-  chatInput          : '',
-  filteredCompletions: null,
-  highlightIndex     : null,
+  classNames           : ['input-autocomplete'],
+  twitch               : Ember.inject.service(),
+  highlightIndex       : 0,
+  filteredCompletions  : null,
+  $completionList      : null,
+  $input               : null,
+  completionListVisible: false,
+  savedCaretPosition   : 0,
+  chatInput            : '',
+  filter               : '',
+
+  onFilterChange: Ember.observer('filter', function () {
+    // strip out the @
+    let filter      = this.get('filter').substr(1);
+    let completions = this.get('completions');
+
+    if (filter) {
+      completions = completions.filter(completion => {
+        return (completion.indexOf(filter) > -1);
+      });
+    }
+
+    this.set('filteredCompletions', completions);
+  }),
 
   // TODO: figure out more Emberish way of highlighting completions
   onHighlightIndexChanged: Ember.observer('highlightIndex', function () {
-    let $items = this.$('.completions li');
+    let $items = this.get('$completionList').children('li');
     let index  = this.get('highlightIndex');
 
-    console.log('$items: ', $items);
-    console.log('highlight index changed: ', index);
-
-    $items.removeClass('highlighted');
-
-    if (index !== null) {
-      console.log('highlighted item: ', $items.eq(index));
-      $items.eq(index).addClass('highlighted');
-    }
+    $items.removeClass('highlighted').eq(index).addClass('highlighted');
   }),
 
   chatInputChanged: Ember.observer('chatInput', function () {
     let chatInput = this.get('chatInput');
-    let messageParts = chatInput.split(' ');
 
-    messageParts.forEach((messagePart) => {
-      if (messagePart.indexOf('@') === 0) {
-        this.filterCompletions(messagePart);
-      } else {
-        this.hideCompletions();
-      }
-    });
+    if (!chatInput) {
+      this.hideCompletions();
+    } else {
+      let messageParts = chatInput.split(' ');
+
+      messageParts.forEach((messagePart) => {
+        if (messagePart && messagePart.indexOf('@') === 0 && this.get('completions').indexOf(messagePart.substr(1)) === -1) {
+          this.set('filter', messagePart);
+        }
+      });
+    }
   }),
 
   actions: {
     say() {
-      let chatInput = this.get('chatInput');
+      let chatInput           = this.get('chatInput');
       let filteredCompletions = this.get('filteredCompletions');
 
+      // TODO: implement text replacement via paste to maintain cursor position
+      // if user selects autocompletion item
       if (filteredCompletions) {
-        let completion = this.$('.completions li').eq(this.get('highlightIndex')).text();
-        let atIndex = chatInput.indexOf('@');
-        let slice = chatInput.slice(0, atIndex + 1);
+        let filter        = this.get('filter').substr(1);
+        let completion    = this.$('.completions li').eq(this.get('highlightIndex')).text();
+        let caretPosition = this.getCaretPosition() + (completion.length - filter.length);
 
-        this.set('chatInput', slice + completion + ' ');
+        this.saveCaretPosition(caretPosition);
+        this.set('chatInput', chatInput.replace(filter, completion));
+        // this.setCaretPosition(caretPosition);
 
-        // TODO: fix hiding completions after autocompleting
         this.hideCompletions();
       } else {
         if (chatInput) {
@@ -64,54 +81,95 @@ export default Ember.Component.extend({
     this._super();
   },
 
+  didInsertElement() {
+    this.set('$completionList', this.$('ul.completions'));
+    this.set('$input', this.$('input'));
+  },
+
+  setHighlightIndex(index) {
+    this.set('highlightIndex', index);
+    this.notifyPropertyChange('highlightIndex');
+  },
+
   didRender() {
     let filtered = this.get('filteredCompletions');
 
-    console.log('filtered: ', filtered);
+    if (this.hasSavedCaretPosition()) {
+      this.restoreCaretPosition();
+    }
 
     if (filtered) {
-      this.$('.completions').addClass('active');
-      this.set('highlightIndex', 0);
+      this.showCompletions();
+    } else {
+      this.hideCompletions();
     }
   },
 
-  filterCompletions(strFilter) {
-    strFilter       = strFilter.replace('@', '');
-    let completions = this.get('completions');
-
-    completions = completions.filter(completion => {
-      return (completion.indexOf(strFilter) > -1);
-    });
-
-    this.set('filteredCompletions', completions);
+  showCompletions() {
+    this.$('.completions').addClass('active');
+    this.setHighlightIndex(0);
+    this.set('completionListVisible', true);
   },
 
   hideCompletions() {
-    this.set('filterCompletions', null);
+    this.$('.completions').removeClass('active');
+    this.set('filter', '');
+    this.set('filteredCompletions', null);
+    this.set('completionListVisible', false);
+  },
+
+  isValidCaretPosition(position) {
+    return (position !== undefined && position <= this.get('chatInput').length && position >= 0);
+  },
+
+  getCaretPosition() {
+    return this.get('$input')[0].selectionStart;
+  },
+
+  saveCaretPosition(position) {
+    if (this.isValidCaretPosition(position)) {
+      this.set('savedCaretPosition', position);
+    }
+  },
+
+  hasSavedCaretPosition() {
+    return this.get('savedCaretPosition');
+  },
+
+  restoreCaretPosition() {
+    let position = this.get('savedCaretPosition');
+
+    if (position !== null) {
+      this.get('$input')[0].setSelectionRange(position, position);
+      this.set('savedCaretPosition', null);
+    }
   },
 
   keyUp(event) {
-    console.log('KEYUP_EVENT: ', event);
     let eventCode = event.keyCode;
     let index     = this.get('highlightIndex');
     let prevIndex = index - 1;
     let nextIndex = index + 1;
     let maxIndex  = this.get('completions').length - 1;
 
-    console.log('eventCode: ', eventCode);
-
     if (eventCode === 38 || eventCode === 40) {
-
-      console.log('ARROW_KEY');
+      if (this.get('completionListVisible')) {
+        event.preventDefault();
+      }
 
       // up arrow
       if (eventCode === 38) {
         index = (prevIndex >= 0) ? prevIndex : 0;
+      // down arrow
       } else if (eventCode === 40) {
         index = (nextIndex <= maxIndex) ? nextIndex : maxIndex;
       }
 
       this.set('highlightIndex', index);
+
+      if (this.get('completionListVisible')) {
+        return false;
+      }
     }
   }
 });
