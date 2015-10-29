@@ -6,16 +6,13 @@ export default Ember.Service.extend({
   settings              : Ember.inject.service(),
   commander             : Ember.inject.service(),
   emotes                : Ember.inject.service(),
+  followers             : Ember.inject.service(),
   channel               : Ember.computed.alias('settings.prefs.defaultChannel'),
   viewerTimeoutDuration : Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
   commandTrigger        : Ember.computed.alias('settings.prefs.commandTrigger'),
   macroTrigger          : Ember.computed.alias('settings.prefs.macroTrigger'),
   streamerName          : Ember.computed.alias('settings.prefs.streamerName'),
   botName               : Ember.computed.alias('settings.prefs.botName'),
-  followerUpdateInterval: '60000', // TODO: add to settings
-  updateFollowerTimer   : null,
-  lastFollowerUpdate    : null,
-  newFollowerCount      : 0,
   clients               : {},
   clientCount           : 0,
   clientConfig          : {},
@@ -25,9 +22,6 @@ export default Ember.Service.extend({
   starred               : [],
   latestSubs            : [],
   lastKnownSub          : '',
-  latestFollowers       : [],
-  lastKnownFollower     : '',
-  followerCount         : 0,
   whisperThreads        : {},
 
   streamer: Ember.computed('streamerName', function () {
@@ -41,7 +35,8 @@ export default Ember.Service.extend({
   onAllConnected: Ember.observer('connected', function () {
     if (this.get('connected')) {
       // starts a poll
-      this.updateFollowers();
+      this.get('followers').update();
+
       this.updateChatterList();
     }
   }),
@@ -141,7 +136,6 @@ export default Ember.Service.extend({
     let streamerClient = this.get('streamer');
 
     streamerClient.on('chat', this.onChatReceived.bind(this));
-    streamerClient.on('whisper', this.onWhisperReceived.bind(this));
     streamerClient.on('action', this.onChatReceived.bind(this));
     streamerClient.on('subscription', this.onNewSubcriber.bind(this));
     // streamerClient.on('join', this.onChannelJoin.bind(this));
@@ -151,10 +145,6 @@ export default Ember.Service.extend({
 
   onNewSubcriber(username) {
     this.get('latestSubs').pushObject(username);
-  },
-
-  onWhisperReceived(username, message) {
-    console.log(`WHISPER from ${username}: ${message}`);
   },
 
   onChatReceived(channel, user, message/*, self*/) {
@@ -228,16 +218,6 @@ export default Ember.Service.extend({
     return 'http://www.twitch.tv/' + username;
   },
 
-  getFollowers() {
-    let streamerName = this.get('streamerName').toLowerCase();
-
-    // TODO: store API urls elsewhere for getFollowers
-    return this.api(`https://api.twitch.tv/kraken/channels/${streamerName}/follows/?limit=100`).then(response => {
-      console.log('getFollowers() response: ', response);
-      return response;
-    });
-  },
-
   toggleStarMessage(message) {
     let starredMessages = this.get('starred');
     let starred         = starredMessages.findBy('index', message.index);
@@ -249,65 +229,11 @@ export default Ember.Service.extend({
     }
   },
 
-  addLatestFollower(username) {
-    this.get('latestFollowers').pushObject(username);
-  },
-
   updateChatterList() {
     this.get('chatlist').update();
   },
 
-  updateFollowers() {
-    let timer = this.get('updateFollowerTimer');
-
-    if (timer) {
-      Ember.run.cancel(timer);
-    }
-
-    this.updateFollowerData();
-    this.set('updateFollowerTimer', Ember.run.later(this, this.updateFollowers, this.get('followerUpdateInterval')));
-  },
-
-  updateFollowerData() {
-    let timestamp = moment().format('h:mm:ss a');
-
-    this.set('lastFollowerUpdate', timestamp);
-
-    return this.getFollowers().then(response => {
-      let follows = response.follows;
-
-      this.set('followerCount', response._total);
-
-      // save point of reference (last follower on session start)
-      if (!this.get('lastKnownFollower')) {
-        this.set('lastKnownFollower', follows[0]);
-      } else {
-        this.addNewFollowers(follows);
-      }
-    });
-  },
-
-  addNewFollowers(follows) {
-    this.set('newFollowerCount', 0);
-
-    let lastKnownFollower = this.get('lastKnownFollower').user.display_name;
-
-    // add every follower until we find the lastKnownFollower
-    follows.some(follow => {
-      let name = follow.user.display_name;
-
-      if (name !== lastKnownFollower) {
-        this.get('latestFollowers').unshiftObject(follow);
-        this.incrementProperty('newFollowerCount');
-      } else {
-        return true;
-      }
-    });
-
-    // update lastKnownFollower
-    this.set('lastKnownFollower', follows[0]);
-  },
-  // TODO: move into separate service
+  // TODO: move whispers into separate service
   saveWhisper(username, message, sendTo) {
     console.log('saveWhisper: ', username, message, sendTo);
 
