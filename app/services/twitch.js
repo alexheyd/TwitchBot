@@ -2,6 +2,7 @@ import Ember from 'ember';
 import TwitchClient from 'twitch-bot/scripts/twitch-client';
 
 export default Ember.Service.extend({
+  whispers              : Ember.inject.service(),
   chatlist              : Ember.inject.service(),
   settings              : Ember.inject.service(),
   commander             : Ember.inject.service(),
@@ -22,7 +23,6 @@ export default Ember.Service.extend({
   starred               : [],
   latestSubs            : [],
   lastKnownSub          : '',
-  whisperThreads        : {},
 
   streamer: Ember.computed('streamerName', function () {
     return this.get('clients.' + this.get('streamerName'));
@@ -42,8 +42,8 @@ export default Ember.Service.extend({
   }),
 
   init() {
+    this.get('whispers').connect();
     this.createClients();
-    this.createGroupClient();
     this.bindTwitchEvents();
   },
 
@@ -74,43 +74,6 @@ export default Ember.Service.extend({
     // add observers for connecting and connected status
     Ember.addObserver(this, `clients.${username}.connected`, this.onClientConnectionChange.bind(this));
     Ember.addObserver(this, `clients.${username}.connecting`, this.onClientConnectionChange.bind(this));
-  },
-
-  // TODO: refactor groupClient creation and management
-  // TODO: maybe allow groupClient to switch users?
-  createGroupClient() {
-    let streamerName = this.get('streamerName');
-    let oauth        = this.get('settings.prefs.users').findBy('username', streamerName).oauth;
-    let groupClient  = new irc.client({
-      options: {
-        debug: true
-      },
-
-      connection: {
-        random   : 'group',
-        reconnect: true
-      },
-
-      identity: {
-        username: streamerName,
-        password: oauth
-      },
-
-      channels: ['#ghostcryptology'] // TODO: make group channel dynamic
-    });
-
-    groupClient.on('whisper', (username, message) => {
-      console.log(`GROUP CLIENT WHISPER from ${username}: ${message}`);
-      this.saveWhisper(username, message);
-    });
-
-    groupClient.connect();
-
-    groupClient.on('connected', () => {
-      console.log('### GROUP CLIENT CONNECTED');
-    });
-
-    this.set('groupClient', groupClient);
   },
 
   onClientConnectionChange() {
@@ -233,27 +196,6 @@ export default Ember.Service.extend({
     this.get('chatlist').update();
   },
 
-  // TODO: move whispers into separate service
-  saveWhisper(username, message, sendTo) {
-    console.log('saveWhisper: ', username, message, sendTo);
-
-    let whisper = {
-      username: username,
-      message : message,
-      sendTo  : (sendTo === undefined) ? false : sendTo
-    };
-
-    let existingThread = this.get('whisperThreads')[username] || null;
-
-    if (existingThread) {
-      existingThread.pushObject(whisper);
-    } else {
-      this.get('whisperThreads')[username] = [whisper];
-    }
-
-    this.notifyPropertyChange('whisperThreads');
-  },
-
 /*******************************************************************************
 ### PROXY TO TwitchClient METHODS
 *******************************************************************************/
@@ -335,10 +277,5 @@ export default Ember.Service.extend({
 
   api(url) {
     return this.get('streamer').api(url);
-  },
-
-  whisper(username, message) {
-    this.saveWhisper(username, message, true);
-    this.get('groupClient').whisper(username, message);
   }
 });

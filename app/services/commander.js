@@ -2,6 +2,7 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
   twitch        : Ember.inject.service(),
+  whispers      : Ember.inject.service(),
   settings      : Ember.inject.service(),
   commandTrigger: Ember.computed.alias('settings.prefs.commandTrigger'),
   macroTrigger  : Ember.computed.alias('settings.prefs.macroTrigger'),
@@ -90,7 +91,7 @@ export default Ember.Service.extend({
     let username     = messageParts.shift();
     let msg          = messageParts.join(' ');
 
-    this.get('twitch').whisper(username, msg);
+    this.get('whispers').send(username, msg);
   },
 
   execute(commandName, params, user) {

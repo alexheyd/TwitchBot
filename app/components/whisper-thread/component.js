@@ -4,7 +4,7 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   classNames       : ['whisper-thread'],
   classNameBindings: ['recipient', 'minimized'],
-  twitch           : Ember.inject.service(),
+  whispers         : Ember.inject.service(),
   threadReply      : '',
   minimized        : false,
 
@@ -13,6 +13,8 @@ export default Ember.Component.extend({
   }),
 
   onThreadUpdate: Ember.observer('thread.[]', function () {
+    console.log('THREAD_UPDATED');
+
     if (!this.get('isVisible')) {
       this.set('isVisible', true);
     }
@@ -27,7 +29,7 @@ export default Ember.Component.extend({
       let reply = this.get('threadReply');
 
       if (reply) {
-        this.get('twitch').whisper(this.get('recipient'), this.get('threadReply'));
+        this.get('whispers').send(this.get('recipient'), this.get('threadReply'));
         this.set('threadReply', '');
       }
     },
@@ -37,6 +39,7 @@ export default Ember.Component.extend({
     },
 
     toggleThread() {
+      console.log('TOGGLING THREAD');
       this.toggleProperty('minimized');
     }
   },
