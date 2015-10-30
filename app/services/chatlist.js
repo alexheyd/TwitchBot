@@ -1,13 +1,13 @@
 import Ember from 'ember';
 
 export default Ember.Service.extend({
-  twitch: Ember.inject.service(),
-  timer: null,
+  twitch       : Ember.inject.service(),
+  timer        : null,
   timerInterval: 60000, // TODO: put chatter update interval in settings
-  viewerCount: 0,
-  all: null,
-  mods: null,
-  chatters: null,
+  viewerCount  : 0,
+  all          : null,
+  mods         : null,
+  chatters     : null,
 
   onChannelChange: Ember.observer('twitch.channel', function () {
     this.update();

@@ -101,13 +101,18 @@ export default Ember.Service.extend({
     streamerClient.on('chat', this.onChatReceived.bind(this));
     streamerClient.on('action', this.onChatReceived.bind(this));
     streamerClient.on('subscription', this.onNewSubcriber.bind(this));
-    // streamerClient.on('join', this.onChannelJoin.bind(this));
+    streamerClient.on('join', this.onChannelJoin.bind(this));
     // streamerClient.on('mods', this.onModListReceived.bind(this));
     // streamerClient.on('notice', this.onTwitchNoticeReceived.bind(this));
   },
 
   onNewSubcriber(username) {
     this.get('latestSubs').pushObject(username);
+  },
+
+  onChannelJoin() {
+    console.log('channel joined: ', arguments);
+    this.get('chatlist').update();
   },
 
   onChatReceived(channel, user, message/*, self*/) {
