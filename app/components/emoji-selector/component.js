@@ -16,6 +16,7 @@ export default Ember.Component.extend({
   }),
 
   actions: {
+    // TODO: fix useEmoji action -- need to insert at cursor position instead of appending
     useEmoji(code) {
       this.sendAction('useEmoji', code);
       this.send('toggleEmojiSelector');

@@ -10,7 +10,9 @@ export default Ember.Service.extend({
     macroTrigger         : '~',
     streamerName         : 'GhostCryptology',
     botName              : 'DevourBot',
-    viewerTimeoutDuration: 300 // in seconds
+    viewerTimeoutDuration: 300, // in seconds
+    followerUpdateInterval: 60000,
+    chatlistUpdateInterval: 60000
   },
 
   users: Ember.computed('prefs.users', function () {

@@ -2,8 +2,9 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
   twitch       : Ember.inject.service(),
+  settings     : Ember.inject.service(),
   timer        : null,
-  timerInterval: 60000, // TODO: put chatter update interval in settings
+  timerInterval: Ember.computed.alias('settings.prefs.chatlistUpdateInterval'),
   viewerCount  : 0,
   all          : null,
   mods         : null,

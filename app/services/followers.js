@@ -2,12 +2,13 @@ import Ember from 'ember';
 
 export default Ember.Service.extend({
   twitch           : Ember.inject.service(),
+  settings         : Ember.inject.service(),
+  interval         : Ember.computed.alias('settings.prefs.followerUpdateInterval'),
   timer            : null,
-  interval         : 60000, // TODO: move follower update interval into settings
   lastUpdate       : null,
+  lastKnownFollower: null,
   count            : 0,
   newCount         : 0,
-  lastKnownFollower: null,
   latest           : [],
 
   update() {
