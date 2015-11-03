@@ -15,7 +15,7 @@ export default Ember.Component.extend({
   // TODO: REMOVE DEV CODE
   didInsertElement() {
     if (ENV.APP.mockMessages) {
-      this.get('twitch').on('join', this.onChannelJoin.bind(this));
+      this.get('twitch.streamer').on('join', this.onChannelJoin.bind(this));
     }
   },
 
