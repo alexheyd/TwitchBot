@@ -17,6 +17,10 @@ nav {
     margin: 0;
     text-transform: uppercase;
 
+    &.active {
+      color: #cc0000;
+    }
+
     &:first-child {
       border-left: none;
     }

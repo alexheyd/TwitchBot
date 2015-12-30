@@ -94,7 +94,7 @@ export default Ember.Service.extend({
     this.get('whispers').send(username, msg);
   },
 
-  execute(commandName, params, user) {
+  execute(commandName, params/*, user*/) {
     let command = this.getRules(commandName);
 
     if (command) {

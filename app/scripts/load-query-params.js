@@ -1,4 +1,4 @@
-import Ember from 'ember';
+// import Ember from 'ember';
 import ENV from 'twitch-bot/config/environment';
 
 export default function () {

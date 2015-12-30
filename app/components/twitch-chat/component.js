@@ -12,11 +12,13 @@ export default Ember.Component.extend({
   enableChatInput  : false,
   enableChatterList: false,
   lastReadMarkerSet: false,
+  chatInput        : '',
 
   actions: {
-    useEmoji(code) {
-      this.insertChat(code);
-    },
+    // useEmoji(code) {
+    //   console.log('twitch-chat useEmoji.. should insertChat: ', code);
+    //   this.insertChat(code);
+    // },
 
     markAsLast(message) {
       if (message.lastRead) {

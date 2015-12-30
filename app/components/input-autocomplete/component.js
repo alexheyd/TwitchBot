@@ -45,14 +45,20 @@ export default Ember.Component.extend({
   chatInputChanged: Ember.observer('chatInput', function () {
     let chatInput = this.get('chatInput');
 
+    // if chat input is empty, hide the completion list
     if (!chatInput) {
       this.hideCompletions();
     } else {
-      let messageParts = chatInput.split(' ');
-      let triggerFound = false;
+      // split the message on spaces to figure out if there's an autocomplete trigger
+      let messageParts    = chatInput.split(' ');
+      let triggerFound    = false;
+      let usernameTrigger = '@';
 
+      // check each word
       messageParts.forEach((messagePart) => {
-        if (messagePart && messagePart.indexOf('@') === 0 && !this.matchesAnyCompletion(messagePart)) {
+        // if usernameTrigger is found, and isn't a completion
+        if (messagePart && messagePart.indexOf(usernameTrigger) === 0 && !this.matchesAnyCompletion(messagePart)) {
+          // filter completion list by that string
           this.set('filter', messagePart);
           triggerFound = true;
         }
@@ -64,6 +70,13 @@ export default Ember.Component.extend({
     }
   }),
 
+  actions: {
+    useEmoji(code) {
+      this.insertChat(' ' + code + ' ');
+      this.focus();
+    }
+  },
+
   init() {
     this.set('filteredCompletions', this.get('completions'));
     this._super();
@@ -72,10 +85,21 @@ export default Ember.Component.extend({
   didInsertElement() {
     this.set('$completionList', this.$('ul.completions'));
     this.set('$input', this.$('input'));
+
+    console.log('input caret position 1: ', this.get('$input')[0].selectionStart);
+
+    // this.set('input', this.get('$input')[0]);
+    //
+    // Ember.addObserver(this, 'input.selectionStart', () => {
+    //   console.log('yay');
+    //   let pos = this.get('input.selectionStart');
+    //
+    //   console.log('caret pos: ', pos);
+    // });
   },
 
   didRender() {
-    let filtered = this.get('filteredCompletions');
+    let filtered      = this.get('filteredCompletions');
 
     if (this.hasSavedCaretPosition()) {
       this.restoreCaretPosition();
@@ -106,6 +130,7 @@ export default Ember.Component.extend({
     let chatInput     = this.get('chatInput');
     let filter        = this.get('filter');
     let completion    = '@' + this.getHighlightedItem().text();
+    // let completion    = this.getHighlightedItem().text();
     let caretPosition = this.getCaretPosition() + (completion.length - filter.length);
     let messageParts  = chatInput.split(' ');
 
@@ -113,9 +138,24 @@ export default Ember.Component.extend({
       return (messagePart === filter) ? completion : messagePart;
     });
 
+    // console.log('completion: ', completion);
+
+    // this.insertChat(completion);
+    // this.replaceChat(filter, completion);
+
     this.saveCaretPosition(caretPosition);
     this.set('chatInput', messageParts.join(' '));
     this.hideCompletions();
+  },
+
+  insertChat(str) {
+    let chatInput = this.get('chatInput');
+    let caretPos  = this.getCaretPosition();
+    let newStr    = chatInput.slice(0, caretPos) + str + chatInput.slice(caretPos);
+
+    this.saveCaretPosition(caretPos + str.length);
+
+    this.set('chatInput', newStr);
   },
 
   showCompletions() {
@@ -153,13 +193,21 @@ export default Ember.Component.extend({
     let position = this.get('savedCaretPosition');
 
     if (position !== null) {
-      this.get('$input')[0].setSelectionRange(position, position);
+      this.setCaret(position);
       this.set('savedCaretPosition', null);
     }
   },
 
+  setCaret(pos) {
+    this.get('$input')[0].setSelectionRange(pos, pos);
+  },
+
   getHighlightedItem() {
     return this.get('$completionList').children('li').eq(this.get('highlightIndex'));
+  },
+
+  focus() {
+    this.get('$input').focus();
   },
 
   keyDown(event) {
