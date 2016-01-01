@@ -4,7 +4,7 @@ import Ember from 'ember';
 export default Ember.Component.extend({
   twitch              : Ember.inject.service(),
   classNames          : ['emoji-selector'],
-  emojis              : Ember.computed.alias('twitch.emotes.usableEmotes'),
+  emojis              : Ember.computed.alias('twitch.emojis.usableEmojis'),
   emojiSelectorVisible: false,
 
   iconClass: Ember.computed('emojiSelectorVisible', function () {
@@ -29,7 +29,7 @@ export default Ember.Component.extend({
 
     image404(imgSrc) {
       let emojiCode = this.$(`img[src="${imgSrc}"]`).parent('li').data('emoji-code');
-      this.get('twitch.emotes').removeUsableEmojiByCode(emojiCode);
+      this.get('twitch.emojis').removeUsableEmojiByCode(emojiCode);
     }
   }
 });

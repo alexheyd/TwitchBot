@@ -10,11 +10,11 @@ export default Ember.Component.extend({
   mentions         : Ember.computed.alias('twitch.mentions'),
   notification     : Ember.computed.alias('notifications.item'),
   connected        : Ember.computed.alias('twitch.connected'),
-  fetchingEmotes   : Ember.computed.alias('twitch.emotes.fetchingEmotes'),
+  fetchingEmojis   : Ember.computed.alias('twitch.emojis.fetchingEmojis'),
   channelJoined    : Ember.computed.alias('twitch.channelJoined'),
 
-  allConnected: Ember.computed('connected', 'channelJoined', 'fetchingEmotes', function() {
-    return this.get('connected') && this.get('channelJoined') && !this.get('fetchingEmotes');
+  allConnected: Ember.computed('connected', 'channelJoined', 'fetchingEmojis', function() {
+    return this.get('connected') && this.get('channelJoined') && !this.get('fetchingEmojis');
   }),
 
   twitchConnectionStatus: Ember.computed('connected', function() {
@@ -26,12 +26,12 @@ export default Ember.Component.extend({
     return this.get('channelJoined') ? `${channel} joined!` : `Joining ${channel}...`;
   }),
 
-  emojiFetchStatus: Ember.computed('fetchingEmotes', function() {
-    return this.get('fetchingEmotes') ? 'Fetching Chat Emojis...' : 'Chat Emojis Fetched!';
+  emojiFetchStatus: Ember.computed('fetchingEmojis', function() {
+    return this.get('fetchingEmojis') ? 'Fetching Chat Emojis...' : 'Chat Emojis Fetched!';
   }),
 
-  emojisFetchedClass: Ember.computed('fetchingEmotes', function() {
-    return this.get('fetchingEmotes') ? 'fa-spinner fa-pulse' : 'fa-check-square-o';
+  emojisFetchedClass: Ember.computed('fetchingEmojis', function() {
+    return this.get('fetchingEmojis') ? 'fa-spinner fa-pulse' : 'fa-check-square-o';
   }),
 
   channelJoinedClass: Ember.computed('channelJoined', function() {
@@ -74,10 +74,10 @@ export default Ember.Component.extend({
   //   }
   // }),
 
-  // onFetchingEmotes: Ember.observer('twitch.emotes.fetchingEmotes', function () {
-  //   let fetchingEmotes = this.get('twitch.emotes.fetchingEmotes');
+  // onfetchingEmojis: Ember.observer('twitch.emojis.fetchingEmojis', function () {
+  //   let fetchingEmojis = this.get('twitch.emojis.fetchingEmojis');
   //
-  //   if (fetchingEmotes) {
+  //   if (fetchingEmojis) {
   //     this.get('notifications').info('Fetching Twitch Emojis... Please wait...');
   //   } else {
   //     //************************************************************************

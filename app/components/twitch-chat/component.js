@@ -91,9 +91,9 @@ export default Ember.Component.extend({
 
       // check each word in the message
       words.forEach(word => {
-        if (this.get('twitch.emotes').isEmote(word)) {
+        if (this.get('twitch.emojis').isEmoji(word)) {
           // create emoji image tag
-          word = `<img src="${this.get('twitch.emotes').getEmote(word).imageUrl}" />`;
+          word = `<img src="${this.get('twitch.emojis').getEmoji(word).imageUrl}" />`;
         }
 
         newMessage.push(word);

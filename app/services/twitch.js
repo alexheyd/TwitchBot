@@ -6,7 +6,7 @@ export default Ember.Service.extend({
   chatlist              : Ember.inject.service(),
   settings              : Ember.inject.service(),
   commander             : Ember.inject.service(),
-  emotes                : Ember.inject.service(),
+  emojis                : Ember.inject.service(),
   followers             : Ember.inject.service(),
   channel               : Ember.computed.alias('settings.prefs.defaultChannel'),
   viewerTimeoutDuration : Ember.computed.alias('settings.prefs.viewerTimeoutDuration'),
