@@ -1,6 +1,10 @@
 {{!-- TODO: add connection status to loading screen --}}
 <div id="loading">
-  <h1>Loading...</h1>
+  <div class="list-group">
+    <span class="list-group-item" href="#"><i class="fa {{twitchConnectedClass}} fa-fw"></i>&nbsp; {{twitchConnectionStatus}}</span>
+    <span class="list-group-item" href="#"><i class="fa {{channelJoinedClass}} fa-fw"></i>&nbsp; {{channelJoinedStatus}}</span>
+    <span class="list-group-item" href="#"><i class="fa {{emojisFetchedClass}} fa-fw"></i>&nbsp; {{emojiFetchStatus}}</span>
+  </div>
 </div>
 
 <nav class="row">

@@ -18,6 +18,7 @@ export default Ember.Service.extend({
   clientCount           : 0,
   clientConfig          : {},
   connected             : false,
+  channelJoined         : false,
   chatroom              : [],
   mentions              : [],
   starred               : [],
@@ -111,7 +112,8 @@ export default Ember.Service.extend({
   },
 
   onChannelJoin() {
-    console.log('channel joined: ', arguments);
+    // console.log('channel joined: ', arguments);
+    this.set('channelJoined', true);
     this.get('chatlist').update();
   },
 

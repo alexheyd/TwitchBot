@@ -3,7 +3,7 @@ import Ember from 'ember';
 export default Ember.Service.extend({
   settings        : Ember.inject.service(),
   twitch          : Ember.inject.service(),
-  fetchingEmotes  : false,
+  fetchingEmotes  : true,
   emotes          : null,
   usableEmotes    : null,
   usableEmoteCount: 0,
@@ -15,7 +15,8 @@ export default Ember.Service.extend({
   onEmoteSets(sets) {
     let promises = [this.get('twitch').api('/chat/emoticon_images').then(this.processEmoteResponse.bind(this)), this.get('twitch').api(`/chat/emoticon_images?emotesets=${sets}`).then(this.processUsableEmoteResponse.bind(this))];
 
-    this.set('fetchingEmotes', true);
+    // making it default to true
+    // this.set('fetchingEmotes', true);
 
     Ember.RSVP.all(promises).then(() => {
       this.set('fetchingEmotes', false);
