@@ -10,9 +10,7 @@
 <nav class="row">
   <ul>
     {{!-- whitespace causes visual space --}}
-    {{#link-to "settings" tagName="li"}}
-      <i class="fa fa-bars fa-fw"></i>Settings
-    {{/link-to}}{{#link-to "dashboard" tagName="li"}}
+    {{#link-to "dashboard" tagName="li"}}
       <i class="fa fa-desktop fa-fw"></i>Dashboard
     {{/link-to}}{{#link-to "starred" tagName="li"}}
       <i class="fa fa-star fa-fw"></i>Starred
@@ -22,6 +20,8 @@
       <i class="fa fa-list-alt fa-fw"></i>Lists
     {{/link-to}}{{#link-to "loyalty" tagName="li"}}
       <i class="fa fa-diamond fa-fw"></i>Loyalty
+    {{/link-to}}{{#link-to "settings" tagName="li"}}
+      <i class="fa fa-bars fa-fw"></i>Settings
     {{/link-to}}
   </ul>
 </nav>
@@ -38,7 +38,7 @@
 
     <div class="row">
       <div id="chat-mentions" class="col-xs-12">
-        {{twitch-chat title="Mentions" messages=mentions}}
+        {{twitch-chat title="@Me" messages=mentions}}
       </div>
     </div>
   </div>

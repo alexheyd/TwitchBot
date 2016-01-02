@@ -1,1 +1,42 @@
 <h3>Lists</h3>
+
+<div class="row">
+  <div class="col-xs-3">
+    <div class="list-group">
+      {{#if lists.length}}
+        {{#each lists as |list|}}
+          <a href="#" class="list-group-item"><i class="fa fa-user fa-fw"></i> {{list.name}}</a>
+        {{/each}}
+      {{else}}
+        <a href="#" class="list-group-item"> No lists created.</a>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="col-xs-9">
+
+
+    <div class="row">
+      <div class="col-xs-8">
+        {{input type="text" value=newListName placeholder="List Name..."}}
+      </div>
+
+      <div class="col-xs-4">
+        <button class="btn btn-primary" {{action "createList"}}><i class="fa fa-user-plus"></i>Create</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-4">
+        {{input type="text" value="" placeholder="List Timer in minutes"}}
+      </div>
+
+      <div class="col-xs-4">
+        Require confirmation? 
+        {{input type="checkbox" checked=true}}
+      </div>
+    </div>
+
+
+  </div>
+</div>

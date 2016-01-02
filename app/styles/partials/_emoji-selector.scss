@@ -1,21 +1,33 @@
 $emoji-selector-height: 175px;
-$emoji-selector-width: 505px;
+// $emoji-selector-width: 505px;
+$emoji-selector-width: 25vw;
+$emoji-image-width: 38px;
 
 .emoji-selector {
   position: relative;
+
+  i {
+    cursor: pointer;
+    font-size: 20px;
+
+    &:hover, &.selected {
+      color: #57D8A4;
+    }
+  }
 
   // actual emoji-selector with emoji icons
   ul {
     display: none;
     position: absolute;
-    top: -$emoji-selector-height;
-    left: -$emoji-selector-width + 20px;
+    top: -6px;
+    left: 19px;
     width: $emoji-selector-width;
     height: $emoji-selector-height;
     background: #fff;
     overflow: scroll;
     box-shadow: 0 1px 5px #666;
     padding: 12px;
+    z-index: 100;
 
     &.visible {
       display: block;
@@ -25,9 +37,8 @@ $emoji-selector-width: 505px;
   li {
     list-style: none;
     display: inline-block;
-    // TODO: fix emoji icon spacing
-    width: 40px;
-    height: 40px;
+    width: $emoji-image-width;
+    height: $emoji-image-width;
     text-align: center;
     vertical-align: middle;
     cursor: pointer;

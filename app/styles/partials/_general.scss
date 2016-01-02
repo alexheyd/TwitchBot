@@ -2,6 +2,7 @@ body {
   font: 14px Open Sans, sans-serif;
   line-height: 18px;
   overflow: hidden;
+  background: #3B454C;
 }
 
 h1, h2, h3 {
@@ -42,6 +43,7 @@ button {
   width: 100vw;
   height: 100vh;
   background: #111;
+  // background: rgba(0, 0, 0, 0.9);
   z-index: 100000;
   text-align: center;
   opacity: 1;
@@ -77,13 +79,19 @@ button {
 }
 
 #chat {
-  // background: #ddd;
+  background: #3B454C;
   height: 100vh;
+
+  h3 {
+    color: #fefefe;
+  }
 }
 
 #main-app {
   height: 100vh;
   overflow-y: scroll;
+  border-top-left-radius: 10px;
+  background: #fefefe;
 
   > .ember-view {
     padding-bottom: 50px;
