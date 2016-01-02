@@ -4,6 +4,10 @@ nav {
   text-align: right;
   height: $header-height;
 
+  i {
+    color: #fff;
+  }
+
   ul {
     margin-bottom: 0;
   }
@@ -17,16 +21,16 @@ nav {
     margin: 0;
     text-transform: uppercase;
 
-    &.active {
-      color: #cc0000;
-    }
-
     &:first-child {
       border-left: none;
     }
 
-    &:hover {
+    &:hover, &.active {
       color: #cc0000;
+
+      i {
+        color: #cc0000;
+      }
     }
   }
 }

@@ -9,12 +9,29 @@
 
 <nav class="row">
   <ul>
-    {{link-to "Settings" "settings" tagName="li"}}
-    {{link-to "Dashboard" "dashboard" tagName="li"}}
-    {{link-to "Starred" "starred" tagName="li"}}
-    {{link-to "Giveaways" "giveaways" tagName="li"}}
-    {{link-to "Lists" "lists" tagName="li"}}
-    {{link-to "Loyalty" "loyalty" tagName="li"}}
+    {{#link-to "settings" tagName="li"}}
+      <i class="fa fa-bars fa-fw"></i>&nbsp; Settings
+    {{/link-to}}
+
+    {{#link-to "dashboard" tagName="li"}}
+      <i class="fa fa-desktop fa-fw"></i>&nbsp; Dashboard
+    {{/link-to}}
+
+    {{#link-to "starred" tagName="li"}}
+      <i class="fa fa-star fa-fw"></i>&nbsp; Starred
+    {{/link-to}}
+
+    {{#link-to "giveaways" tagName="li"}}
+      <i class="fa fa-usd fa-fw"></i>&nbsp; Giveaways
+    {{/link-to}}
+
+    {{#link-to "lists" tagName="li"}}
+      <i class="fa fa-list-alt fa-fw"></i>&nbsp; Lists
+    {{/link-to}}
+
+    {{#link-to "loyalty" tagName="li"}}
+      <i class="fa fa-diamond fa-fw"></i>&nbsp; Loyalty
+    {{/link-to}}
   </ul>
 </nav>
 

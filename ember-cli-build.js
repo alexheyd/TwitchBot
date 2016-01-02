@@ -22,6 +22,10 @@ module.exports = function(defaults) {
   // along with the exports of each module as its value.
 
   app.import('bower_components/moment/moment.js');
+  app.import('bower_components/chosen/chosen.jquery.min.js');
+  app.import('bower_components/chosen/chosen.min.css');
+  app.import('bower_components/chosen/chosen-sprite.png');
+  app.import('bower_components/chosen/chosen-sprite@2x.png');
 
   return app.toTree();
 };

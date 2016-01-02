@@ -14,7 +14,7 @@ export default Ember.Component.extend({
   channelJoined    : Ember.computed.alias('twitch.channelJoined'),
 
   allConnected: Ember.computed('connected', 'channelJoined', 'fetchingEmojis', function() {
-    return this.get('connected') && this.get('channelJoined') && !this.get('fetchingEmojis');
+    return this.get('connected') && this.get('channelJoined');// && !this.get('fetchingEmojis');
   }),
 
   twitchConnectionStatus: Ember.computed('connected', function() {

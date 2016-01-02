@@ -40,7 +40,7 @@ export default Ember.Service.extend({
       }
     }
   },
-
+  // macros make the streamer account say something predefined in chat
   macros: {
     hype(name) {
       this.get('twitch').say(`######## ${name} ######## SUB HYPPPPPPEEEEEE @@@`);

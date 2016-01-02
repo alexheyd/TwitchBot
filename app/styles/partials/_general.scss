@@ -4,6 +4,10 @@ body {
   overflow: hidden;
 }
 
+select {
+  width: 200px;
+}
+
 .application.connected {
   #loading {
     opacity: 0;

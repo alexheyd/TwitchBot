@@ -1,42 +1,39 @@
-<h2>Settings</h2>
-
-{{account-selector}}
-
-{{new-user}}
-
-{{user-manager}}
-
-<h3>General Options</h3>
-<div class="row">
-  <div class="col-xs-3">
-    <h4>Default Channel</h4>
-    {{input type="text" focus-out="save" value=defaultChannel}}
-  </div>
-
-  <div class="col-xs-3">
-    <h4>Timeout Duration</h4>
-    {{input type="text" focus-out="save" value=viewerTimeoutDuration}}
-  </div>
-
-  <div class="col-xs-3">
-    <h4>Command Trigger</h4>
-    {{input type="text" focus-out="save" value=commandTrigger}}
-  </div>
-
-  <div class="col-xs-3">
-    <h4>Macro Trigger</h4>
-    {{input type="text" focus-out="save" value=macroTrigger}}
-  </div>
-</div>
+<h3>Settings</h3>
 
 <div class="row">
-  <div class="col-xs-6">
-    <h4>Follower Update Interval</h4>
-    {{input type="text" focus-out="save" value=followerUpdateInterval}}
+  <div class="col-xs-3">
+    <div class="list-group">
+      {{#link-to "settings.accounts" class="list-group-item"}}
+        <i class="fa fa-user fa-fw"></i>&nbsp; Accounts
+      {{/link-to}}
+      
+      {{#link-to "settings.chat" class="list-group-item"}}
+        <i class="fa fa-comments fa-fw"></i>&nbsp; Chat
+      {{/link-to}}
+
+      {{#link-to "settings.commands" class="list-group-item"}}
+        <i class="fa fa-terminal fa-fw"></i>&nbsp; Commands
+      {{/link-to}}
+
+      {{#link-to "settings.macros" class="list-group-item"}}
+        <i class="fa fa-magic fa-fw"></i>&nbsp; Macros
+      {{/link-to}}
+
+      {{#link-to "settings.lists" class="list-group-item"}}
+        <i class="fa fa-list-alt fa-fw"></i>&nbsp; Lists
+      {{/link-to}}
+
+      {{#link-to "settings.loyalty" class="list-group-item"}}
+        <i class="fa fa-diamond fa-fw"></i>&nbsp; Loyalty
+      {{/link-to}}
+
+      {{#link-to "settings.giveaways" class="list-group-item"}}
+        <i class="fa fa-usd fa-fw"></i>&nbsp; Giveaways
+      {{/link-to}}
+    </div>
   </div>
 
-  <div class="col-xs-6">
-    <h4>Chatlist Update Interval</h4>
-    {{input type="text" focus-out="save" value=chatlistUpdateInterval}}
+  <div class="col-xs-9">
+    {{outlet}}
   </div>
 </div>
