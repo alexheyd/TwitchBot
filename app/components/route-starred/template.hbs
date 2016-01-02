@@ -1,2 +1,9 @@
 <h3>Starred Messages</h3>
+
+{{#unless starredMessages}}
+<p>
+  No saved messages.
+</p>
+{{/unless}}
+
 {{twitch-chat messages=starredMessages}}

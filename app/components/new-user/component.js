@@ -1,10 +1,11 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  settings   : Ember.inject.service(),
-  classNames : ['add-user'],
-  newUsername: null,
-  newOauth   : null,
+  settings      : Ember.inject.service(),
+  notifications : Ember.inject.service(),
+  classNames    : ['add-user'],
+  newUsername   : null,
+  newOauth      : null,
 
   actions: {
     addUser() {
@@ -18,6 +19,7 @@ export default Ember.Component.extend({
     let settings    = this.get('settings');
 
     if (!newUsername || !newOauth) {
+      this.get('notifications').error('Both username and oauth tokens are required to add a new account.');
       return;
     }
 

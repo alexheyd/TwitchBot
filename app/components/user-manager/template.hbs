@@ -4,15 +4,15 @@
   <div class="col-xs-12">
     {{#each users as |user index|}}
       <div class="row">
-        <div class="user col-xs-4">
+        <div class="user col-xs-5">
           {{input type="text" value=user.username focus-out="save"}}
         </div>
 
-        <div class="oauth col-xs-4">
+        <div class="oauth col-xs-5">
           {{input type="text" value=user.oauth focus-out="save"}}
         </div>
 
-        <div class="button col-xs-4">
+        <div class="button col-xs-2">
           <button class="btn btn-danger" {{action "removeUser" user}}><i class="fa fa-trash-o fa-lg"></i>Delete</button>
         </div>
       </div>

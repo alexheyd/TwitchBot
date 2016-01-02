@@ -1,5 +1,9 @@
 .settings {
-  .user, .add-user, .no-users {
+  input[type="text"] {
+    width: 100%;
+  }
+
+  .user {
     margin-bottom: 6px;
   }
 

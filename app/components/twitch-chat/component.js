@@ -14,12 +14,11 @@ export default Ember.Component.extend({
   lastReadMarkerSet: false,
   chatInput        : '',
 
-  actions: {
-    // useEmoji(code) {
-    //   console.log('twitch-chat useEmoji.. should insertChat: ', code);
-    //   this.insertChat(code);
-    // },
+  onMessageAdded: Ember.observer('messages.[]', function () {
+    this.set('newMessages', !this.isScrolledToBottom());
+  }),
 
+  actions: {
     markAsLast(message) {
       if (message.lastRead) {
         this.markAllAsRead();
@@ -72,10 +71,6 @@ export default Ember.Component.extend({
 
     this.convertEmojis();
   },
-
-  onMessageAdded: Ember.observer('messages.[]', function () {
-    this.set('newMessages', !this.isScrolledToBottom());
-  }),
 
   convertEmojis() {
     let msgs = this.get('messages');
