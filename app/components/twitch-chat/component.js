@@ -1,7 +1,7 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames       : ['twitch-chat', 'row'],
+  classNames       : ['twitch-chat'],
   twitch           : Ember.inject.service(),
   chatlist         : Ember.inject.service(),
   commander        : Ember.inject.service(),

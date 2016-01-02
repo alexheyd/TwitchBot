@@ -1,12 +1,17 @@
 import Ember from 'ember';
 
 export default Ember.Component.extend({
-  classNames               : ['chatter-list'],
-  chatlist                 : Ember.inject.service(),
-  viewerCount              : Ember.computed.alias('chatlist.viewerCount'),
-  viewerList               : Ember.computed.alias('chatlist.all'),
-  viewers                  : [],
-  searchTerm               : '',
+  classNames    : ['chatter-list'],
+  chatlist      : Ember.inject.service(),
+  viewerCount   : Ember.computed.alias('chatlist.viewerCount'),
+  viewerList    : Ember.computed.alias('chatlist.all'),
+  viewers       : [],
+  searchTerm    : '',
+  chatlistActive: false,
+
+  chatlistClass: Ember.computed('chatlistActive', function() {
+    return this.get('chatlistActive') ? 'active' : '';
+  }),
 
   onViewerListChanged: Ember.observer('viewerList', function () {
     this.set('viewers', this.get('viewerList'));
@@ -21,5 +26,11 @@ export default Ember.Component.extend({
     });
 
     this.set('viewers', viewers);
-  })
+  }),
+
+  actions: {
+    toggleChatList() {
+      this.toggleProperty('chatlistActive');
+    }
+  }
 });

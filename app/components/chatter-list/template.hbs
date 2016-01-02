@@ -1,19 +1,20 @@
-<h3>
-  Chatter List
-
+<a href="#" class="chatter-list-trigger {{chatlistClass}}" {{action 'toggleChatList'}}>
+  <i class="fa fa-users"></i>
   {{#if viewerCount}}
     ({{viewerCount}})
   {{/if}}
-</h3>
+</a>
 
-<div class="search">
-  {{input type="text" value=searchTerm placeholder="Search..."}}
+<div class="chatlist {{chatlistClass}}">
+  <div class="search">
+    {{input type="text" value=searchTerm placeholder="Search..."}}
+  </div>
+
+  <ul>
+    {{#each viewers as |viewer|}}
+      <li class="viewer">
+        <span class="username">{{viewer}}</span>
+      </li>
+    {{/each}}
+  </ul>
 </div>
-
-<ul>
-  {{#each viewers as |viewer|}}
-    <li class="viewer">
-      <span class="username">{{viewer}}</span>
-    </li>
-  {{/each}}
-</ul>

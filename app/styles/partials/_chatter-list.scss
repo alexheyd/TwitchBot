@@ -1,14 +1,58 @@
 .chatter-list {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  z-index: 100;
+
   input {
     width: 100%;
   }
 
   ul {
     margin-top: 10px;
+    padding-right: 6px;
 
     li {
       list-style: none;
       text-align: right;
     }
+  }
+}
+
+html body .chatter-list-trigger {
+  color: #000;
+  border: 1px solid #999;
+  background: #eee;
+  border-radius: 3px;
+  padding: 6px;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &.active {
+    background: #999;
+    border: 1px solid #333;
+    color: #fff;
+    text-decoration: none;
+  }
+}
+
+.chatlist {
+  position: absolute;
+  top: 0;
+  right: -170px;
+  width: 170px;
+  opacity: 0;
+  background: #eee;
+  visibility: hidden;
+  border: 1px solid #999;
+  // transition: opacity 250ms ease-in-out;
+  transition: visibility 0s, opacity 300ms ease-in-out;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
   }
 }
