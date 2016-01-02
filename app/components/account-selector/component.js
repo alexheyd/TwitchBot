@@ -23,9 +23,5 @@ export default Ember.Component.extend({
         settings.save();
       }
     }
-  },
-
-  didInsertElement() {
-    console.log('users: ', this.get('users'));
   }
 });

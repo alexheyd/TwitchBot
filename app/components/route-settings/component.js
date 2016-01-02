@@ -14,16 +14,6 @@ export default Ember.Component.extend({
   newOauth              : null,
   mainAccount           : null,
 
-  actions: {
-    save() {
-      this.save();
-    }
-  },
-
-  save() {
-    this.get('settings').save();
-  },
-
   didInsertElement() {
     this.get('settings').load();
   }
