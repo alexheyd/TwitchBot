@@ -12,6 +12,11 @@ module.exports = function(environment) {
       }
     },
 
+    googleFonts: [
+      'Open+Sans:300',
+      'Roboto:300'
+    ],
+
     contentSecurityPolicy: {
       'default-src': "'none'",
       'script-src': "'self' https://cdn.mxpnl.com http://d2g2wobxbkulb1.cloudfront.net https://d2g2wobxbkulb1.cloudfront.net http://tmi.twitch.tv http://api.twitch.tv https://api.twitch.tv", // Allow scripts from https://cdn.mxpnl.com

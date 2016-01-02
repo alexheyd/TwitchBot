@@ -1,6 +1,7 @@
-<div class="row account-selector">
+<div class="row">
   <div class="col-xs-6">
     <h4>Streamer Account</h4>
+
     <select onchange={{action "selectStreamerAccount" value="target.value"}}>
       <option value="">Select Account</option>
       {{#each users as |user index|}}
@@ -11,6 +12,7 @@
 
   <div class="col-xs-6">
     <h4>Bot Account</h4>
+
     <select onchange={{action "selectBotAccount" value="target.value"}}>
       <option value="">Select Account</option>
       {{#each users as |user index|}}

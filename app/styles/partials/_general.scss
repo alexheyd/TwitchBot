@@ -1,11 +1,31 @@
 body {
-  font: 14px Arial, sans-serif;
+  font: 14px Open Sans, sans-serif;
   line-height: 18px;
   overflow: hidden;
 }
 
+h1, h2, h3 {
+  font-family: Roboto;
+  font-weight: normal;
+}
+
+h4, h5, h6 {
+  font-family: Roboto Condensed;
+  font-weight: normal;
+}
+
+button i {
+  margin-right: 5px;
+}
+
 select {
   width: 200px;
+}
+
+button {
+  text-transform: uppercase;
+  font-family: Roboto Condensed;
+  font-weight: bold;
 }
 
 .application.connected {

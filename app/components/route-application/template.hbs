@@ -1,36 +1,27 @@
 {{!-- TODO: add connection status to loading screen --}}
 <div id="loading">
   <div class="list-group">
-    <span class="list-group-item" href="#"><i class="fa {{twitchConnectedClass}} fa-fw"></i>&nbsp; {{twitchConnectionStatus}}</span>
-    <span class="list-group-item" href="#"><i class="fa {{channelJoinedClass}} fa-fw"></i>&nbsp; {{channelJoinedStatus}}</span>
-    <span class="list-group-item" href="#"><i class="fa {{emojisFetchedClass}} fa-fw"></i>&nbsp; {{emojiFetchStatus}}</span>
+    <span class="list-group-item" href="#"><i class="fa {{twitchConnectedClass}} fa-fw"></i> {{twitchConnectionStatus}}</span>
+    <span class="list-group-item" href="#"><i class="fa {{channelJoinedClass}} fa-fw"></i> {{channelJoinedStatus}}</span>
+    <span class="list-group-item" href="#"><i class="fa {{emojisFetchedClass}} fa-fw"></i> {{emojiFetchStatus}}</span>
   </div>
 </div>
 
 <nav class="row">
   <ul>
+    {{!-- whitespace causes visual space --}}
     {{#link-to "settings" tagName="li"}}
-      <i class="fa fa-bars fa-fw"></i>&nbsp; Settings
-    {{/link-to}}
-
-    {{#link-to "dashboard" tagName="li"}}
-      <i class="fa fa-desktop fa-fw"></i>&nbsp; Dashboard
-    {{/link-to}}
-
-    {{#link-to "starred" tagName="li"}}
-      <i class="fa fa-star fa-fw"></i>&nbsp; Starred
-    {{/link-to}}
-
-    {{#link-to "giveaways" tagName="li"}}
-      <i class="fa fa-usd fa-fw"></i>&nbsp; Giveaways
-    {{/link-to}}
-
-    {{#link-to "lists" tagName="li"}}
-      <i class="fa fa-list-alt fa-fw"></i>&nbsp; Lists
-    {{/link-to}}
-
-    {{#link-to "loyalty" tagName="li"}}
-      <i class="fa fa-diamond fa-fw"></i>&nbsp; Loyalty
+      <i class="fa fa-bars fa-fw"></i>Settings
+    {{/link-to}}{{#link-to "dashboard" tagName="li"}}
+      <i class="fa fa-desktop fa-fw"></i>Dashboard
+    {{/link-to}}{{#link-to "starred" tagName="li"}}
+      <i class="fa fa-star fa-fw"></i>Starred
+    {{/link-to}}{{#link-to "giveaways" tagName="li"}}
+      <i class="fa fa-usd fa-fw"></i>Giveaways
+    {{/link-to}}{{#link-to "lists" tagName="li"}}
+      <i class="fa fa-list-alt fa-fw"></i>Lists
+    {{/link-to}}{{#link-to "loyalty" tagName="li"}}
+      <i class="fa fa-diamond fa-fw"></i>Loyalty
     {{/link-to}}
   </ul>
 </nav>

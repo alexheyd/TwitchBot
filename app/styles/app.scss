@@ -1,21 +1,14 @@
 // @import "mixins/reset";
 // @include reset;
 
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic|Roboto:400,700|Roboto+Condensed:400,700);
+
 $header-height: 42px;
 
 .dev {
   width: 100vw;
   height: 100vh;
   background: #fff;
-}
-
-i {
-  cursor: pointer;
-  color: #333;
-
-  &:hover, &.selected {
-    color: #cc0000 !important;
-  }
 }
 
 @import

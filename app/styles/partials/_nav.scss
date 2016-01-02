@@ -1,11 +1,12 @@
 nav {
-  background: #000;
+  background: #3B454C;
   color: #fff;
   text-align: right;
   height: $header-height;
 
   i {
     color: #fff;
+    margin-right: 5px;
   }
 
   ul {
@@ -20,16 +21,30 @@ nav {
     border-left: 1px solid #333;
     margin: 0;
     text-transform: uppercase;
+    font-family: Roboto Condensed;
 
     &:first-child {
       border-left: none;
     }
 
-    &:hover, &.active {
-      color: #cc0000;
+    &:hover {
+      color: #57D8A4;
 
       i {
-        color: #cc0000;
+        color: #57D8A4;
+      }
+    }
+
+    &.active {
+      color: #fff;
+      background: #57D8A4;
+
+      &:hover {
+        color: #fff;
+
+        i {
+          color: #fff;
+        }
       }
     }
   }
