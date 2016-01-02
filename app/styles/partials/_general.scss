@@ -90,10 +90,22 @@ button {
 #main-app {
   height: 100vh;
   overflow-y: scroll;
-  border-top-left-radius: 10px;
+  border-top-left-radius: 20px;
   background: #fefefe;
+  border-top: 5px solid #57D8A4;
+  border-left: 5px solid #57D8A4;
 
   > .ember-view {
     padding-bottom: 50px;
   }
+}
+
+
+
+/* Bootstrap overrides */
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover,
+.btn-primary {
+  background-color: #57D8A4;
+  border-color: #57D8A4;
 }
